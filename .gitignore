@@ -1,0 +1,29 @@
+# Next.js build output
+.next/
+
+# Logs
+logs
+*.log
+
+# Dependency directories
+node_modules/
+.pnpm-store/
+
+# System files
+.DS_Store
+
+# Build artifacts
+*.pack.gz
+trace
+*.node
+
+# Environment
+.env
+dist/
+
+# Package manager
+.pnpm/
+
+# IDE settings
+.vscode/
+.idea/
