@@ -17,9 +17,11 @@ export default function Dashboard() {
             <Button variant="ghost" className="text-white">
               Messages
             </Button>
-            <Button variant="ghost" className="text-white">
-              Profile
-            </Button>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white">
+                Profile
+              </Button>
+            </Link>
           </nav>
         </div>
       </header>
