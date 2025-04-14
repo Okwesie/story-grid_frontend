@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 // Yellow accent color to match the dashboard
 const accentColor = "#f4ce15" // Bright yellow to match StoryGrid logo
@@ -78,82 +79,87 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile info */}
-      <div className="container mx-auto px-4 md:px-12 lg:px-16 pt-24 md:pt-8">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 md:ml-48">
-          <div>
-            <h1 className="text-3xl font-bold">Jane Doe</h1>
-            <p className="text-[#8892b0] mt-1">Multimedia Storyteller</p>
+      <div className="container mx-auto px-4 md:px-12 lg:px-16">
+        {/* Profile header section with margin for avatar */}
+        <div className="pt-20 md:pt-6 md:pl-48">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-center md:text-left">Jane Doe</h1>
+              <p className="text-[#8892b0] mt-1 text-center md:text-left">Multimedia Storyteller</p>
 
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Visual Stories</Badge>
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Audio Narratives</Badge>
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Interactive Fiction</Badge>
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Documentary</Badge>
+              <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
+                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Visual Stories</Badge>
+                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Audio Narratives</Badge>
+                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Interactive Fiction</Badge>
+                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Documentary</Badge>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                <div className="flex items-center gap-2 text-[#8892b0]">
+                  <MapPin className="h-4 w-4" />
+                  <span>San Francisco, CA</span>
+                </div>
+                <div className="flex items-center gap-2 text-[#8892b0]">
+                  <Mail className="h-4 w-4" />
+                  <span>jane.doe@example.com</span>
+                </div>
+                <div className="flex items-center gap-2 text-[#8892b0]">
+                  <Calendar className="h-4 w-4" />
+                  <span>Member since April 2023</span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-6">
-              <div className="flex items-center gap-2 text-[#8892b0]">
-                <MapPin className="h-4 w-4" />
-                <span>San Francisco, CA</span>
-              </div>
-              <div className="flex items-center gap-2 text-[#8892b0]">
-                <Mail className="h-4 w-4" />
-                <span>jane.doe@example.com</span>
-              </div>
-              <div className="flex items-center gap-2 text-[#8892b0]">
-                <Calendar className="h-4 w-4" />
-                <span>Member since April 2023</span>
-              </div>
+            <div className="flex gap-3 mt-6 md:mt-0">
+              <Link href="/edit_profile">
+                <Button variant="outline" className="border-[#f3d34a] text-[#f3d34a] hover:bg-[#f3d34a]/10">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </Link>
+              <Button className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 md:mt-0">
-            <Button variant="outline" className="border-[#f3d34a] text-[#f3d34a] hover:bg-[#f3d34a]/10">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
+          {/* Bio */}
+          <div className="mb-8">
+            <p className="text-[#8892b0] leading-relaxed">
+              Passionate storyteller exploring the intersection of narrative and technology. I create immersive multimedia
+              stories that blend text, visuals, audio, and interactive elements. My work focuses on environmental themes
+              and human connections in the digital age.
+            </p>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            <div className="bg-[#112240] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#f3d34a]">24</p>
+              <p className="text-[#8892b0] text-sm">Stories</p>
+            </div>
+            <div className="bg-[#112240] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#f3d34a]">1.2k</p>
+              <p className="text-[#8892b0] text-sm">Followers</p>
+            </div>
+            <div className="bg-[#112240] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#f3d34a]">15.8k</p>
+              <p className="text-[#8892b0] text-sm">Views</p>
+            </div>
+            <div className="bg-[#112240] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#f3d34a]">128</p>
+              <p className="text-[#8892b0] text-sm">Appreciations</p>
+            </div>
+          </div>
+
+          {/* Create Story Button */}
+          <div className="mb-8">
+            <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
+              <Plus className="h-5 w-5 mr-2" />
+              Create New Story
             </Button>
-            <Button className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]">
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
-            </Button>
           </div>
-        </div>
-
-        {/* Bio */}
-        <div className="mb-8">
-          <p className="text-[#8892b0] leading-relaxed">
-            Passionate storyteller exploring the intersection of narrative and technology. I create immersive multimedia
-            stories that blend text, visuals, audio, and interactive elements. My work focuses on environmental themes
-            and human connections in the digital age.
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#f3d34a]">24</p>
-            <p className="text-[#8892b0] text-sm">Stories</p>
-          </div>
-          <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#f3d34a]">1.2k</p>
-            <p className="text-[#8892b0] text-sm">Followers</p>
-          </div>
-          <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#f3d34a]">15.8k</p>
-            <p className="text-[#8892b0] text-sm">Views</p>
-          </div>
-          <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#f3d34a]">128</p>
-            <p className="text-[#8892b0] text-sm">Appreciations</p>
-          </div>
-        </div>
-
-        {/* Create Story Button */}
-        <div className="mb-8">
-          <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
-            <Plus className="h-5 w-5 mr-2" />
-            Create New Story
-          </Button>
         </div>
 
         {/* Tabs */}
