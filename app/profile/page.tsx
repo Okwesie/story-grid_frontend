@@ -25,6 +25,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 
+// Yellow accent color to match the dashboard
+const accentColor = "#f4ce15" // Bright yellow to match StoryGrid logo
+
 interface StoryCardProps {
   title: string;
   description: string;
@@ -66,26 +69,26 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#0a192f] text-white">
       {/* Header with background gradient */}
       <div className="relative h-48 md:h-64 w-full bg-gradient-to-r from-[#0a192f] via-[#112240] to-[#0a192f]">
-        <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 flex flex-col items-center md:items-start">
+        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 flex flex-col items-center md:items-start">
           <Avatar className="h-32 w-32 border-4 border-[#0a192f] shadow-lg">
             <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Profile" />
-            <AvatarFallback className="bg-[#112240] text-[#d4a5a5] text-2xl">JD</AvatarFallback>
+            <AvatarFallback className="bg-[#112240] text-[#f3d34a] text-2xl">JD</AvatarFallback>
           </Avatar>
         </div>
       </div>
 
       {/* Profile info */}
-      <div className="container mx-auto px-4 pt-24 md:pt-6 md:pl-48">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8">
+      <div className="container mx-auto px-4 md:px-12 lg:px-16 pt-24 md:pt-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 md:ml-48">
           <div>
             <h1 className="text-3xl font-bold">Jane Doe</h1>
             <p className="text-[#8892b0] mt-1">Multimedia Storyteller</p>
 
             <div className="flex flex-wrap gap-2 mt-4">
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#d4a5a5]">Visual Stories</Badge>
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#d4a5a5]">Audio Narratives</Badge>
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#d4a5a5]">Interactive Fiction</Badge>
-              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#d4a5a5]">Documentary</Badge>
+              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Visual Stories</Badge>
+              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Audio Narratives</Badge>
+              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Interactive Fiction</Badge>
+              <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Documentary</Badge>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
@@ -105,11 +108,11 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex gap-3 mt-6 md:mt-0">
-            <Button variant="outline" className="border-[#d4a5a5] text-[#d4a5a5] hover:bg-[#d4a5a5]/10">
+            <Button variant="outline" className="border-[#f3d34a] text-[#f3d34a] hover:bg-[#f3d34a]/10">
               <Edit className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>
-            <Button className="bg-[#d4a5a5] hover:bg-[#d4a5a5]/90 text-[#0a192f]">
+            <Button className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]">
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
@@ -128,26 +131,26 @@ export default function ProfilePage() {
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#d4a5a5]">24</p>
+            <p className="text-2xl font-bold text-[#f3d34a]">24</p>
             <p className="text-[#8892b0] text-sm">Stories</p>
           </div>
           <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#d4a5a5]">1.2k</p>
+            <p className="text-2xl font-bold text-[#f3d34a]">1.2k</p>
             <p className="text-[#8892b0] text-sm">Followers</p>
           </div>
           <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#d4a5a5]">15.8k</p>
+            <p className="text-2xl font-bold text-[#f3d34a]">15.8k</p>
             <p className="text-[#8892b0] text-sm">Views</p>
           </div>
           <div className="bg-[#112240] rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-[#d4a5a5]">128</p>
+            <p className="text-2xl font-bold text-[#f3d34a]">128</p>
             <p className="text-[#8892b0] text-sm">Appreciations</p>
           </div>
         </div>
 
         {/* Create Story Button */}
         <div className="mb-8">
-          <Button className="w-full bg-[#d4a5a5] hover:bg-[#d4a5a5]/90 text-[#0a192f] py-6">
+          <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
             <Plus className="h-5 w-5 mr-2" />
             Create New Story
           </Button>
@@ -159,7 +162,7 @@ export default function ProfilePage() {
             <TabsTrigger
               value="stories"
               className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#d4a5a5]",
+                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
                 "data-[state=inactive]:text-[#8892b0]",
               )}
             >
@@ -168,7 +171,7 @@ export default function ProfilePage() {
             <TabsTrigger
               value="collections"
               className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#d4a5a5]",
+                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
                 "data-[state=inactive]:text-[#8892b0]",
               )}
             >
@@ -177,7 +180,7 @@ export default function ProfilePage() {
             <TabsTrigger
               value="bookmarks"
               className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#d4a5a5]",
+                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
                 "data-[state=inactive]:text-[#8892b0]",
               )}
             >
@@ -186,7 +189,7 @@ export default function ProfilePage() {
             <TabsTrigger
               value="collaborations"
               className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#d4a5a5]",
+                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
                 "data-[state=inactive]:text-[#8892b0]",
               )}
             >
@@ -376,7 +379,7 @@ function StoryCard({ title, description, type, date, views, likes, comments, tag
         <p className="text-[#8892b0] text-sm mb-4">{description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {tags.map((tag: string, index: number) => (
-            <Badge key={index} variant="outline" className="text-xs border-[#d4a5a5] text-[#d4a5a5]">
+            <Badge key={index} variant="outline" className="text-xs border-[#f3d34a] text-[#f3d34a]">
               {tag}
             </Badge>
           ))}
@@ -393,11 +396,11 @@ function StoryCard({ title, description, type, date, views, likes, comments, tag
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="text-[#8892b0] hover:text-[#d4a5a5] transition-colors flex items-center gap-1">
+            <button className="text-[#8892b0] hover:text-[#f3d34a] transition-colors flex items-center gap-1">
               <Heart className="h-3 w-3" />
               <span className="text-xs">{likes}</span>
             </button>
-            <button className="text-[#8892b0] hover:text-[#d4a5a5] transition-colors flex items-center gap-1">
+            <button className="text-[#8892b0] hover:text-[#f3d34a] transition-colors flex items-center gap-1">
               <MessageSquare className="h-3 w-3" />
               <span className="text-xs">{comments}</span>
             </button>
@@ -414,7 +417,7 @@ function CollectionCard({ title, description, storyCount, lastUpdated }: Collect
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <Badge className="bg-[#d4a5a5] text-[#0a192f]">{storyCount} Stories</Badge>
+          <Badge className="bg-[#f3d34a] text-[#0a192f]">{storyCount} Stories</Badge>
         </div>
         <p className="text-[#8892b0] text-sm mb-4">{description}</p>
         <div className="grid grid-cols-4 gap-2 mb-4">
@@ -433,7 +436,7 @@ function CollectionCard({ title, description, storyCount, lastUpdated }: Collect
             <Calendar className="h-3 w-3" />
             <span>Updated {lastUpdated}</span>
           </div>
-          <a href="#" className="text-[#d4a5a5] text-sm hover:underline">
+          <a href="#" className="text-[#f3d34a] text-sm hover:underline">
             View Collection →
           </a>
         </div>
@@ -468,13 +471,13 @@ function BookmarkedStoryCard({ title, author, description, type, date }: Bookmar
           </div>
           <div>
             <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-            <p className="text-[#d4a5a5] text-sm mb-2">by {author}</p>
+            <p className="text-[#f3d34a] text-sm mb-2">by {author}</p>
             <p className="text-[#8892b0] text-sm mb-2">{description}</p>
             <div className="flex items-center gap-2 text-[#8892b0] text-xs">
               <Calendar className="h-3 w-3" />
               <span>{date}</span>
               <div className="flex items-center gap-1 ml-2">
-                <Bookmark className="h-3 w-3 fill-[#d4a5a5] text-[#d4a5a5]" />
+                <Bookmark className="h-3 w-3 fill-[#f3d34a] text-[#f3d34a]" />
               </div>
             </div>
           </div>
@@ -500,7 +503,7 @@ function CollaborationCard({ title, description, collaborators, status, lastUpda
             {[1, 2, 3].map((item) => (
               <Avatar key={item} className="border-2 border-[#112240] h-8 w-8">
                 <AvatarImage src={`/placeholder.svg?height=32&width=32`} alt={`Collaborator ${item}`} />
-                <AvatarFallback className="bg-[#1d3557] text-[#d4a5a5] text-xs">
+                <AvatarFallback className="bg-[#1d3557] text-[#f3d34a] text-xs">
                   {String.fromCharCode(64 + item)}
                 </AvatarFallback>
               </Avatar>
@@ -518,7 +521,7 @@ function CollaborationCard({ title, description, collaborators, status, lastUpda
             <Calendar className="h-3 w-3" />
             <span>Updated {lastUpdated}</span>
           </div>
-          <a href="#" className="text-[#d4a5a5] text-sm hover:underline">
+          <a href="#" className="text-[#f3d34a] text-sm hover:underline">
             View Project →
           </a>
         </div>
