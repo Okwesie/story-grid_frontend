@@ -1,394 +1,207 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import {
-  Bell,
   Search,
-  Plus,
-  TrendingUp,
-  Clock,
-  Heart,
-  MessageSquare,
-  Eye,
-  BarChart3,
-  Bookmark,
-  Play,
-  Headphones,
-  ImageIcon,
-  Type,
   Settings,
-  ChevronRight,
-  Zap,
   Users,
-  Star,
-  Share2,
+  Plus,
+  Phone,
+  Video,
+  MoreVertical,
+  Paperclip,
+  ImageIcon,
+  Send,
+  Check,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-interface Story {
-  id: number;
-  title: string;
-  type: "visual" | "audio" | "video" | "interactive";
-  thumbnail?: string;
-  views?: number;
-  likes?: number;
-  comments?: number;
-  timeAgo?: string;
-  lastEdited?: string;
-  author?: string;
-  authorAvatar?: string;
-}
+export default function MessagingApp() {
+  const [activeTab, setActiveTab] = useState("all")
+  const [activeChatId, setActiveChatId] = useState(2)
 
-interface Notification {
-  id: number;
-  type: "like" | "comment" | "follow";
-  user: string;
-  content: string;
-  time: string;
-  avatar: string;
-  read: boolean;
-}
+  const tabs = [
+    { id: "all", label: "All" }
+  ]
 
-// Helper function to get icon based on content type
-const getTypeIcon = (type: Story["type"]) => {
-  switch (type) {
-    case "visual":
-      return <ImageIcon className="h-4 w-4" />
-    case "audio":
-      return <Headphones className="h-4 w-4" />
-    case "video":
-      return <Play className="h-4 w-4" />
-    case "interactive":
-      return <Type className="h-4 w-4" />
-    default:
-      return <ImageIcon className="h-4 w-4" />
-  }
-}
+  const contacts = [
+    { id: 1, name: "John Doe", message: "Hey, how's the story coming along?", time: "2m ago", unread: 2, online: true },
+    { id: 2, name: "Jane Smith", message: "I've finished the first draft!", time: "1h ago", unread: 0, online: false },
+    { id: 3, name: "Alex Johnson", message: "Can we meet tomorrow?", time: "3h ago", unread: 0, online: false },
+    { id: 4, name: "Sarah Williams", message: "The new chapter looks great!", time: "5h ago", unread: 1, online: true },
+  ]
 
-export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<string>("overview")
-
-  // Sample data for dashboard
-  const recentStories: Story[] = [
-    {
-      id: 1,
-      title: "The Silent Forest",
-      type: "visual",
-      thumbnail: "/placeholder.svg?height=80&width=120",
-      views: 342,
-      likes: 56,
-      comments: 12,
-      timeAgo: "2 days ago",
-    },
+  const messages = [
+    { id: 1, sender: "them", content: "Hey there! How's your story coming along?", time: "10:30 AM" },
     {
       id: 2,
-      title: "Urban Soundscapes",
-      type: "audio",
-      thumbnail: "/placeholder.svg?height=80&width=120",
-      views: 189,
-      likes: 34,
-      comments: 8,
-      timeAgo: "1 week ago",
+      sender: "me",
+      content: "It's going well! I'm working on the climax right now.",
+      time: "10:32 AM",
+      status: "read",
     },
-    {
-      id: 3,
-      title: "Digital Nomads",
-      type: "video",
-      thumbnail: "/placeholder.svg?height=80&width=120",
-      views: 567,
-      likes: 98,
-      comments: 24,
-      timeAgo: "2 weeks ago",
-    },
+    { id: 3, sender: "them", content: "That's great! Can't wait to read it.", time: "10:33 AM" },
   ]
 
-  const draftStories: Story[] = [
-    {
-      id: 4,
-      title: "Future Cities",
-      type: "visual",
-      lastEdited: "Yesterday",
-    },
-    {
-      id: 5,
-      title: "Ocean Depths",
-      type: "interactive",
-      lastEdited: "3 days ago",
-    },
-  ]
-
-  const recommendedStories: Story[] = [
-    {
-      id: 6,
-      title: "Mountain Expeditions",
-      author: "Alex Rivera",
-      type: "visual",
-      thumbnail: "/placeholder.svg?height=120&width=200",
-      authorAvatar: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: 7,
-      title: "Jazz in the City",
-      author: "Maria Chen",
-      type: "audio",
-      thumbnail: "/placeholder.svg?height=120&width=200",
-      authorAvatar: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: 8,
-      title: "Tokyo Nights",
-      author: "James Wilson",
-      type: "video",
-      thumbnail: "/placeholder.svg?height=120&width=200",
-      authorAvatar: "/placeholder.svg?height=32&width=32",
-    },
-  ]
-
-  const notifications: Notification[] = [
-    {
-      id: 1,
-      type: "like",
-      user: "Alex Rivera",
-      content: "liked your story 'The Silent Forest'",
-      time: "2 hours ago",
-      avatar: "/placeholder.svg?height=32&width=32",
-      read: false,
-    },
-    {
-      id: 2,
-      type: "comment",
-      user: "Maria Chen",
-      content: "commented on your story 'Urban Soundscapes'",
-      time: "1 day ago",
-      avatar: "/placeholder.svg?height=32&width=32",
-      read: true,
-    },
-    {
-      id: 3,
-      type: "follow",
-      user: "James Wilson",
-      content: "started following you",
-      time: "3 days ago",
-      avatar: "/placeholder.svg?height=32&width=32",
-      read: true,
-    },
-  ]
+  const activeContact = contacts.find((contact) => contact.id === activeChatId)
 
   return (
-    <div className="min-h-screen bg-[#0a192f] flex flex-col">
-      {/* Header */}
-      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/dashboard">
-            <h1 className="text-[#f3d34a] text-2xl font-bold">StoryGrid</h1>
-          </Link>
+    <div className="flex h-screen bg-slate-900 text-slate-100">
+      {/* Sidebar - Reduced width */}
+      <div className="w-64 flex-shrink-0 border-r border-slate-800 flex flex-col">
+        <div className="p-4 flex items-center justify-between">
+          <h1 className="text-xl font-bold">Messages</h1>
+          <div className="flex gap-2">
+            <button className="p-1.5 rounded-full hover:bg-slate-800">
+              <Settings size={18} />
+            </button>
+            <button className="p-1.5 rounded-full hover:bg-slate-800">
+              <Users size={18} />
+            </button>
+            <button className="p-1.5 rounded-full hover:bg-slate-800">
+              <Plus size={18} />
+            </button>
+          </div>
+        </div>
 
-          {/* Search Bar - Desktop */}
-          <div className="hidden md:flex relative max-w-md w-full mx-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
-            <Input
-              placeholder="Search stories, creators, tags..."
-              className="pl-10 bg-[#112240] border-[#1d3557] text-white focus-visible:ring-[#f3d34a] w-full"
+        <div className="px-4 pb-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" size={16} />
+            <input
+              type="text"
+              placeholder="Search messages..."
+              className="w-full bg-slate-800 rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-slate-700"
             />
           </div>
-
-          <nav className="flex items-center space-x-2 md:space-x-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" className="text-[#f3d34a]">
-                Home
-              </Button>
-            </Link>
-            <Link href="/feed_page">
-              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
-                Explore
-              </Button>
-            </Link>
-            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-            </Button>
-            <Link href="/messages">
-              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
-                Messages
-              </Button>
-            </Link>
-            <Link href="/profile">
-              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
-                Profile
-              </Button>
-            </Link>
-          </nav>
         </div>
-      </header>
 
-      <main className="flex-grow container mx-auto p-4 md:p-6">
-        {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Welcome back, Jane</h2>
-            <p className="text-[#8892b0]">Here's what's happening with your stories</p>
-          </div>
-          <div className="mt-4 md:mt-0 flex gap-3">
-            <Link href="/create-story">
-              <Button className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Story
-              </Button>
-            </Link>
-            <Link href="/settings">
-              <Button className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
-            </Link>
+        <div className="px-2 pb-2 flex justify-center">
+          <div className="inline-flex bg-slate-800 rounded-md p-0.5">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={cn(
+                  "px-3 py-1 text-xs rounded-md transition-colors",
+                  activeTab === tab.id ? "bg-slate-700" : "hover:bg-slate-750",
+                )}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Dashboard Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-[#112240] border border-[#1d3557]">
-            <TabsTrigger value="overview" className="text-white data-[state=active]:bg-[#1d3557]">
-              Overview
-            </TabsTrigger>
-            
-            <TabsTrigger value="analytics" className="text-white data-[state=active]:bg-[#1d3557]">
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            {/* Recent Stories */}
-            <Card className="bg-[#112240] border-[#1d3557]">
-              <CardHeader>
-                <CardTitle className="text-white">Recent Stories</CardTitle>
-                <CardDescription className="text-[#8892b0]">
-                  Your most recent published stories
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentStories.map((story) => (
-                    <div key={story.id} className="flex items-center gap-4">
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                        <img
-                          src={story.thumbnail}
-                          alt={story.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-2 left-2 bg-[#0a192f]/80 px-2 py-1 rounded-full flex items-center gap-1">
-                          {getTypeIcon(story.type)}
-                          <span className="text-xs text-white capitalize">{story.type}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-white font-medium">{story.title}</h3>
-                        <div className="flex items-center gap-4 text-sm text-[#8892b0] mt-1">
-                          <span className="flex items-center gap-1">
-                            <Eye className="h-4 w-4" />
-                            {story.views}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Heart className="h-4 w-4" />
-                            {story.likes}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MessageSquare className="h-4 w-4" />
-                            {story.comments}
-                          </span>
-                          <span>{story.timeAgo}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+        <div className="flex-1 overflow-y-auto">
+          {contacts.map((contact) => (
+            <div
+              key={contact.id}
+              className={cn(
+                "flex items-center p-3 cursor-pointer hover:bg-slate-800/50",
+                activeChatId === contact.id && "bg-slate-800",
+              )}
+              onClick={() => setActiveChatId(contact.id)}
+            >
+              <div className="relative mr-3">
+                <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center text-lg font-medium">
+                  {contact.name.charAt(0)}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Draft Stories */}
-            <Card className="bg-[#112240] border-[#1d3557]">
-              <CardHeader>
-                <CardTitle className="text-white">Draft Stories</CardTitle>
-                <CardDescription className="text-[#8892b0]">
-                  Continue working on your drafts
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {draftStories.map((story) => (
-                    <div key={story.id} className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-[#1d3557] p-2 rounded-lg">
-                          {getTypeIcon(story.type)}
-                        </div>
-                        <div>
-                          <h3 className="text-white font-medium">{story.title}</h3>
-                          <p className="text-sm text-[#8892b0]">Last edited {story.lastEdited}</p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" className="text-[#f3d34a]">
-                        Continue
-                      </Button>
-                    </div>
-                  ))}
+                {contact.online && (
+                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-slate-900"></div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium truncate">{contact.name}</span>
+                  <span className="text-xs text-slate-400">{contact.time}</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Recommended Stories */}
-            <Card className="bg-[#112240] border-[#1d3557]">
-              <CardHeader>
-                <CardTitle className="text-white">Recommended Stories</CardTitle>
-                <CardDescription className="text-[#8892b0]">
-                  Stories you might like
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {recommendedStories.map((story) => (
-                    <div key={story.id} className="group">
-                      <div className="relative aspect-video rounded-lg overflow-hidden">
-                        <img
-                          src={story.thumbnail}
-                          alt={story.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                        <div className="absolute top-2 left-2 bg-[#0a192f]/80 px-2 py-1 rounded-full flex items-center gap-1">
-                          {getTypeIcon(story.type)}
-                          <span className="text-xs text-white capitalize">{story.type}</span>
-                        </div>
-                      </div>
-                      <div className="mt-2">
-                        <h3 className="text-white font-medium">{story.title}</h3>
-                        {story.author && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={story.authorAvatar} alt={story.author} />
-                              <AvatarFallback className="bg-[#1d3557] text-[#f3d34a] text-xs">
-                                {story.author.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm text-[#8892b0]">{story.author}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-slate-400 truncate">{contact.message}</p>
+                  {contact.unread > 0 && (
+                    <span className="ml-1.5 flex-shrink-0 w-5 h-5 bg-yellow-500 rounded-full text-xs flex items-center justify-center">
+                      {contact.unread}
+                    </span>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-          {/* ... rest of the tabs content ... */}
-        </Tabs>
-      </main>
+      {/* Chat area */}
+      <div className="flex-1 flex flex-col">
+        {/* Chat header */}
+        <div className="p-3 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center text-lg font-medium mr-3">
+              {activeContact?.name.charAt(0)}
+            </div>
+            <div>
+              <h2 className="font-medium">{activeContact?.name}</h2>
+              <p className="text-xs text-slate-400">{activeContact?.online ? "Online" : "Offline"}</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button className="p-2 rounded-full hover:bg-slate-800">
+              <Phone size={18} />
+            </button>
+            <button className="p-2 rounded-full hover:bg-slate-800">
+              <Video size={18} />
+            </button>
+            <button className="p-2 rounded-full hover:bg-slate-800">
+              <MoreVertical size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div key={message.id} className={cn("flex", message.sender === "me" ? "justify-end" : "justify-start")}>
+              {message.sender === "them" && (
+                <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-sm font-medium mr-2 flex-shrink-0 self-end">
+                  {activeContact?.name.charAt(0)}
+                </div>
+              )}
+              <div className="max-w-[70%]">
+                <div
+                  className={cn(
+                    "rounded-2xl px-4 py-2",
+                    message.sender === "me" ? "bg-yellow-500 text-slate-900" : "bg-slate-800",
+                  )}
+                >
+                  <p>{message.content}</p>
+                </div>
+                <div className="flex items-center mt-1">
+                  <span className="text-xs text-slate-400">{message.time}</span>
+                  {message.status === "read" && <Check size={14} className="ml-1 text-slate-400" />}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Message input - Fixed spacing */}
+        <div className="p-3 border-t border-slate-800">
+          <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1">
+            <button className="p-2 text-slate-400 hover:text-slate-200">
+              <Paperclip size={18} />
+            </button>
+            <button className="p-2 text-slate-400 hover:text-slate-200">
+              <ImageIcon size={18} />
+            </button>
+            <input
+              type="text"
+              placeholder="Type a message..."
+              className="flex-1 bg-transparent border-none focus:outline-none text-sm py-2"
+            />
+            <button className="p-2 bg-yellow-500 text-slate-900 rounded-md hover:bg-yellow-600">
+              <Send size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
