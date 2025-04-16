@@ -11,9 +11,11 @@ export default function Dashboard() {
             <Button variant="ghost" className="text-white">
               Home
             </Button>
-            <Button variant="ghost" className="text-white">
-              Explore
-            </Button>
+            <Link href="/feed_page">
+              <Button variant="ghost" className="text-white">
+                Explore
+              </Button>
+            </Link>
             <Button variant="ghost" className="text-white">
               Messages
             </Button>
