@@ -17,6 +17,8 @@ import {
   Eye,
   Bookmark,
   Plus,
+  Search,
+  Bell,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -25,6 +27,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { Input } from "@/components/ui/input"
 
 // Yellow accent color to match the dashboard
 const accentColor = "#f4ce15" // Bright yellow to match StoryGrid logo
@@ -67,288 +70,336 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("stories")
 
   return (
-    <div className="min-h-screen bg-[#0a192f] text-white">
-      {/* Header with background gradient */}
-      <div className="relative h-48 md:h-64 w-full bg-gradient-to-r from-[#0a192f] via-[#112240] to-[#0a192f]">
-        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 flex flex-col items-center md:items-start">
-          <Avatar className="h-32 w-32 border-4 border-[#0a192f] shadow-lg">
-            <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Profile" />
-            <AvatarFallback className="bg-[#112240] text-[#f3d34a] text-2xl">JD</AvatarFallback>
-          </Avatar>
+    <div className="min-h-screen bg-[#0a192f] flex flex-col">
+      {/* Header */}
+      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/dashboard">
+            <h1 className="text-[#f3d34a] text-2xl font-bold">StoryGrid</h1>
+          </Link>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex relative max-w-md w-full mx-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
+            <Input
+              placeholder="Search stories, creators, tags..."
+              className="pl-10 bg-[#112240] border-[#1d3557] text-white focus-visible:ring-[#f3d34a] w-full"
+            />
+          </div>
+
+          <nav className="flex items-center space-x-2 md:space-x-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#f3d34a]">
+                Home
+              </Button>
+            </Link>
+            <Link href="/feed_page">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Explore
+              </Button>
+            </Link>
+            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </Button>
+            <Link href="/messages">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Messages
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
+            </Link>
+          </nav>
         </div>
-      </div>
+      </header>
 
-      {/* Profile info */}
-      <div className="container mx-auto px-4 md:px-12 lg:px-16">
-        {/* Profile header section with margin for avatar */}
-        <div className="pt-20 md:pt-6 md:pl-48">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-center md:text-left">Jane Doe</h1>
-              <p className="text-[#8892b0] mt-1 text-center md:text-left">Multimedia Storyteller</p>
+      {/* Rest of the profile page content */}
+      <div className="min-h-screen bg-[#0a192f] text-white">
+        {/* Header with background gradient */}
+        <div className="relative h-48 md:h-64 w-full bg-gradient-to-r from-[#0a192f] via-[#112240] to-[#0a192f]">
+          <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 flex flex-col items-center md:items-start">
+            <Avatar className="h-32 w-32 border-4 border-[#0a192f] shadow-lg">
+              <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Profile" />
+              <AvatarFallback className="bg-[#112240] text-[#f3d34a] text-2xl">JD</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
 
-              <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
-                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Visual Stories</Badge>
-                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Audio Narratives</Badge>
-                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Interactive Fiction</Badge>
-                <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Documentary</Badge>
+        {/* Profile info */}
+        <div className="container mx-auto px-4 md:px-12 lg:px-16">
+          {/* Profile header section with margin for avatar */}
+          <div className="pt-20 md:pt-6 md:pl-48">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8">
+              <div>
+                <h1 className="text-3xl font-bold text-center md:text-left">Jane Doe</h1>
+                <p className="text-[#8892b0] mt-1 text-center md:text-left">Multimedia Storyteller</p>
+
+                <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
+                  <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Visual Stories</Badge>
+                  <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Audio Narratives</Badge>
+                  <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Interactive Fiction</Badge>
+                  <Badge className="bg-[#112240] hover:bg-[#1d3557] text-[#f3d34a]">Documentary</Badge>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                  <div className="flex items-center gap-2 text-[#8892b0]">
+                    <MapPin className="h-4 w-4" />
+                    <span>San Francisco, CA</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#8892b0]">
+                    <Mail className="h-4 w-4" />
+                    <span>jane.doe@example.com</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#8892b0]">
+                    <Calendar className="h-4 w-4" />
+                    <span>Member since April 2023</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 mt-6">
-                <div className="flex items-center gap-2 text-[#8892b0]">
-                  <MapPin className="h-4 w-4" />
-                  <span>San Francisco, CA</span>
-                </div>
-                <div className="flex items-center gap-2 text-[#8892b0]">
-                  <Mail className="h-4 w-4" />
-                  <span>jane.doe@example.com</span>
-                </div>
-                <div className="flex items-center gap-2 text-[#8892b0]">
-                  <Calendar className="h-4 w-4" />
-                  <span>Member since April 2023</span>
-                </div>
+              <div className="flex gap-3 mt-6 md:mt-0">
+                <Link href="/edit_profile">
+                  <Button variant="outline" className="border-[#f3d34a] text-[#f3d34a] hover:bg-[#f3d34a]/10">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </Link>
+                <Button className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]">
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6 md:mt-0">
-              <Link href="/edit_profile">
-                <Button variant="outline" className="border-[#f3d34a] text-[#f3d34a] hover:bg-[#f3d34a]/10">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-              </Link>
-              <Button className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]">
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
+            {/* Bio */}
+            <div className="mb-8">
+              <p className="text-[#8892b0] leading-relaxed">
+                Passionate storyteller exploring the intersection of narrative and technology. I create immersive multimedia
+                stories that blend text, visuals, audio, and interactive elements. My work focuses on environmental themes
+                and human connections in the digital age.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <div className="bg-[#112240] rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-[#f3d34a]">24</p>
+                <p className="text-[#8892b0] text-sm">Stories</p>
+              </div>
+              <div className="bg-[#112240] rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-[#f3d34a]">1.2k</p>
+                <p className="text-[#8892b0] text-sm">Followers</p>
+              </div>
+              <div className="bg-[#112240] rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-[#f3d34a]">15.8k</p>
+                <p className="text-[#8892b0] text-sm">Views</p>
+              </div>
+              <div className="bg-[#112240] rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-[#f3d34a]">128</p>
+                <p className="text-[#8892b0] text-sm">Appreciations</p>
+              </div>
+            </div>
+
+            {/* Create Story Button */}
+            <div className="mb-8">
+              <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
+                <Plus className="h-5 w-5 mr-2" />
+                Create New Story
               </Button>
             </div>
           </div>
 
-          {/* Bio */}
-          <div className="mb-8">
-            <p className="text-[#8892b0] leading-relaxed">
-              Passionate storyteller exploring the intersection of narrative and technology. I create immersive multimedia
-              stories that blend text, visuals, audio, and interactive elements. My work focuses on environmental themes
-              and human connections in the digital age.
-            </p>
-          </div>
+          {/* Tabs */}
+          <Tabs defaultValue="stories" className="w-full" onValueChange={setActiveTab}>
+            <TabsList className="bg-[#112240] w-full justify-start">
+              <TabsTrigger
+                value="stories"
+                className={cn(
+                  "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
+                  "data-[state=inactive]:text-[#8892b0]",
+                )}
+              >
+                My Stories
+              </TabsTrigger>
+              <TabsTrigger
+                value="collections"
+                className={cn(
+                  "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
+                  "data-[state=inactive]:text-[#8892b0]",
+                )}
+              >
+                Collections
+              </TabsTrigger>
+              <TabsTrigger
+                value="bookmarks"
+                className={cn(
+                  "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
+                  "data-[state=inactive]:text-[#8892b0]",
+                )}
+              >
+                Bookmarked
+              </TabsTrigger>
+              <TabsTrigger
+                value="collaborations"
+                className={cn(
+                  "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
+                  "data-[state=inactive]:text-[#8892b0]",
+                )}
+              >
+                Collaborations
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <div className="bg-[#112240] rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-[#f3d34a]">24</p>
-              <p className="text-[#8892b0] text-sm">Stories</p>
-            </div>
-            <div className="bg-[#112240] rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-[#f3d34a]">1.2k</p>
-              <p className="text-[#8892b0] text-sm">Followers</p>
-            </div>
-            <div className="bg-[#112240] rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-[#f3d34a]">15.8k</p>
-              <p className="text-[#8892b0] text-sm">Views</p>
-            </div>
-            <div className="bg-[#112240] rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-[#f3d34a]">128</p>
-              <p className="text-[#8892b0] text-sm">Appreciations</p>
-            </div>
-          </div>
+            <TabsContent value="stories" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StoryCard
+                  title="The Silent Forest"
+                  description="An immersive journey through the last old-growth forests of the Pacific Northwest."
+                  type="visual"
+                  date="Apr 12, 2023"
+                  views={3240}
+                  likes={187}
+                  comments={24}
+                  tags={["Nature", "Photography", "Audio"]}
+                />
+                <StoryCard
+                  title="Digital Nomads"
+                  description="Exploring the lives of those who work remotely while traveling the world."
+                  type="video"
+                  date="Mar 5, 2023"
+                  views={5621}
+                  likes={342}
+                  comments={56}
+                  tags={["Documentary", "Travel", "Lifestyle"]}
+                />
+                <StoryCard
+                  title="Echoes of the City"
+                  description="An audio-visual exploration of urban soundscapes and their impact on our daily lives."
+                  type="audio"
+                  date="Feb 18, 2023"
+                  views={1872}
+                  likes={94}
+                  comments={12}
+                  tags={["Urban", "Sound", "Interactive"]}
+                />
+                <StoryCard
+                  title="Memory Fragments"
+                  description="An interactive narrative about memory, loss, and the digital footprints we leave behind."
+                  type="interactive"
+                  date="Jan 22, 2023"
+                  views={4210}
+                  likes={276}
+                  comments={38}
+                  tags={["Interactive", "Technology", "Memory"]}
+                />
+                <StoryCard
+                  title="Ocean Depths"
+                  description="Dive into the mysterious world beneath the waves through immersive storytelling."
+                  type="visual"
+                  date="Dec 10, 2022"
+                  views={2984}
+                  likes={163}
+                  comments={29}
+                  tags={["Ocean", "Science", "Visual"]}
+                />
+                <StoryCard
+                  title="Voices of Change"
+                  description="Interviews with activists making a difference in their communities around the world."
+                  type="audio"
+                  date="Nov 5, 2022"
+                  views={3752}
+                  likes={218}
+                  comments={47}
+                  tags={["Activism", "Interviews", "Global"]}
+                />
+              </div>
+            </TabsContent>
 
-          {/* Create Story Button */}
-          <div className="mb-8">
-            <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
-              <Plus className="h-5 w-5 mr-2" />
-              Create New Story
-            </Button>
-          </div>
+            <TabsContent value="collections" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CollectionCard
+                  title="Environmental Stories"
+                  description="A collection of narratives exploring our relationship with the natural world."
+                  storyCount={5}
+                  lastUpdated="Apr 15, 2023"
+                />
+                <CollectionCard
+                  title="Urban Explorations"
+                  description="Stories about city life, architecture, and the human experience in urban environments."
+                  storyCount={3}
+                  lastUpdated="Mar 22, 2023"
+                />
+                <CollectionCard
+                  title="Technology & Humanity"
+                  description="Examining how technology shapes our lives, relationships, and future."
+                  storyCount={4}
+                  lastUpdated="Feb 10, 2023"
+                />
+                <CollectionCard
+                  title="Travel Diaries"
+                  description="Multimedia journals from my adventures around the world."
+                  storyCount={7}
+                  lastUpdated="Jan 5, 2023"
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="bookmarks" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <BookmarkedStoryCard
+                  title="The Future of Storytelling"
+                  author="Alex Rivera"
+                  description="How emerging technologies are transforming narrative experiences."
+                  type="interactive"
+                  date="Apr 18, 2023"
+                />
+                <BookmarkedStoryCard
+                  title="Sounds of the Amazon"
+                  author="Maria Santos"
+                  description="An audio journey through the world's largest rainforest."
+                  type="audio"
+                  date="Apr 5, 2023"
+                />
+                <BookmarkedStoryCard
+                  title="Urban Legends"
+                  author="James Chen"
+                  description="Exploring the myths and stories that shape our cities."
+                  type="visual"
+                  date="Mar 27, 2023"
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="collaborations" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CollaborationCard
+                  title="Climate Chronicles"
+                  description="A global collaborative project documenting climate change impacts and solutions."
+                  collaborators={5}
+                  status="In Progress"
+                  lastUpdated="Apr 20, 2023"
+                />
+                <CollaborationCard
+                  title="Digital Identities"
+                  description="Exploring how we present ourselves online versus in real life."
+                  collaborators={3}
+                  status="Completed"
+                  lastUpdated="Mar 15, 2023"
+                />
+                <CollaborationCard
+                  title="Pandemic Stories"
+                  description="A collection of personal narratives from around the world during COVID-19."
+                  collaborators={12}
+                  status="Completed"
+                  lastUpdated="Dec 10, 2022"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="stories" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="bg-[#112240] w-full justify-start">
-            <TabsTrigger
-              value="stories"
-              className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
-                "data-[state=inactive]:text-[#8892b0]",
-              )}
-            >
-              My Stories
-            </TabsTrigger>
-            <TabsTrigger
-              value="collections"
-              className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
-                "data-[state=inactive]:text-[#8892b0]",
-              )}
-            >
-              Collections
-            </TabsTrigger>
-            <TabsTrigger
-              value="bookmarks"
-              className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
-                "data-[state=inactive]:text-[#8892b0]",
-              )}
-            >
-              Bookmarked
-            </TabsTrigger>
-            <TabsTrigger
-              value="collaborations"
-              className={cn(
-                "data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]",
-                "data-[state=inactive]:text-[#8892b0]",
-              )}
-            >
-              Collaborations
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="stories" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <StoryCard
-                title="The Silent Forest"
-                description="An immersive journey through the last old-growth forests of the Pacific Northwest."
-                type="visual"
-                date="Apr 12, 2023"
-                views={3240}
-                likes={187}
-                comments={24}
-                tags={["Nature", "Photography", "Audio"]}
-              />
-              <StoryCard
-                title="Digital Nomads"
-                description="Exploring the lives of those who work remotely while traveling the world."
-                type="video"
-                date="Mar 5, 2023"
-                views={5621}
-                likes={342}
-                comments={56}
-                tags={["Documentary", "Travel", "Lifestyle"]}
-              />
-              <StoryCard
-                title="Echoes of the City"
-                description="An audio-visual exploration of urban soundscapes and their impact on our daily lives."
-                type="audio"
-                date="Feb 18, 2023"
-                views={1872}
-                likes={94}
-                comments={12}
-                tags={["Urban", "Sound", "Interactive"]}
-              />
-              <StoryCard
-                title="Memory Fragments"
-                description="An interactive narrative about memory, loss, and the digital footprints we leave behind."
-                type="interactive"
-                date="Jan 22, 2023"
-                views={4210}
-                likes={276}
-                comments={38}
-                tags={["Interactive", "Technology", "Memory"]}
-              />
-              <StoryCard
-                title="Ocean Depths"
-                description="Dive into the mysterious world beneath the waves through immersive storytelling."
-                type="visual"
-                date="Dec 10, 2022"
-                views={2984}
-                likes={163}
-                comments={29}
-                tags={["Ocean", "Science", "Visual"]}
-              />
-              <StoryCard
-                title="Voices of Change"
-                description="Interviews with activists making a difference in their communities around the world."
-                type="audio"
-                date="Nov 5, 2022"
-                views={3752}
-                likes={218}
-                comments={47}
-                tags={["Activism", "Interviews", "Global"]}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="collections" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <CollectionCard
-                title="Environmental Stories"
-                description="A collection of narratives exploring our relationship with the natural world."
-                storyCount={5}
-                lastUpdated="Apr 15, 2023"
-              />
-              <CollectionCard
-                title="Urban Explorations"
-                description="Stories about city life, architecture, and the human experience in urban environments."
-                storyCount={3}
-                lastUpdated="Mar 22, 2023"
-              />
-              <CollectionCard
-                title="Technology & Humanity"
-                description="Examining how technology shapes our lives, relationships, and future."
-                storyCount={4}
-                lastUpdated="Feb 10, 2023"
-              />
-              <CollectionCard
-                title="Travel Diaries"
-                description="Multimedia journals from my adventures around the world."
-                storyCount={7}
-                lastUpdated="Jan 5, 2023"
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="bookmarks" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <BookmarkedStoryCard
-                title="The Future of Storytelling"
-                author="Alex Rivera"
-                description="How emerging technologies are transforming narrative experiences."
-                type="interactive"
-                date="Apr 18, 2023"
-              />
-              <BookmarkedStoryCard
-                title="Sounds of the Amazon"
-                author="Maria Santos"
-                description="An audio journey through the world's largest rainforest."
-                type="audio"
-                date="Apr 5, 2023"
-              />
-              <BookmarkedStoryCard
-                title="Urban Legends"
-                author="James Chen"
-                description="Exploring the myths and stories that shape our cities."
-                type="visual"
-                date="Mar 27, 2023"
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="collaborations" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <CollaborationCard
-                title="Climate Chronicles"
-                description="A global collaborative project documenting climate change impacts and solutions."
-                collaborators={5}
-                status="In Progress"
-                lastUpdated="Apr 20, 2023"
-              />
-              <CollaborationCard
-                title="Digital Identities"
-                description="Exploring how we present ourselves online versus in real life."
-                collaborators={3}
-                status="Completed"
-                lastUpdated="Mar 15, 2023"
-              />
-              <CollaborationCard
-                title="Pandemic Stories"
-                description="A collection of personal narratives from around the world during COVID-19."
-                collaborators={12}
-                status="Completed"
-                lastUpdated="Dec 10, 2022"
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   )

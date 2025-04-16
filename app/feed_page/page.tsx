@@ -43,6 +43,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import Link from "next/link"
 
 interface User {
   name: string;
@@ -299,71 +300,49 @@ export default function FeedPage() {
   })
 
   return (
-    <div className="min-h-screen bg-[#0a192f] text-white">
+    <div className="min-h-screen bg-[#0a192f] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0a192f] border-b border-[#1d3557] px-4 py-3">
-        <div className="container mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-[#f3d34a]">StoryGrid</h1>
-          </div>
+      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/dashboard">
+            <h1 className="text-[#f3d34a] text-2xl font-bold">StoryGrid</h1>
+          </Link>
 
-          {/* Search - Desktop */}
-          <div className="hidden md:flex relative flex-1 max-w-md mx-4">
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex relative max-w-md w-full mx-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
             <Input
               placeholder="Search stories, creators, tags..."
               className="pl-10 bg-[#112240] border-[#1d3557] text-white focus-visible:ring-[#f3d34a] w-full"
-              value={searchQuery}
-              onChange={handleSearchChange}
             />
           </div>
 
-          {/* Navigation Icons */}
-          <div className="flex items-center gap-2 md:gap-4">
-            {/* Search Icon - Mobile */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden text-white hover:text-[#f3d34a]"
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-            >
-              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-            </Button>
-
+          <nav className="flex items-center space-x-2 md:space-x-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#f3d34a]">
+                Home
+              </Button>
+            </Link>
+            <Link href="/feed_page">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Explore
+              </Button>
+            </Link>
             <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
               <Bell className="h-5 w-5" />
               <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
             </Button>
-
-            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a]">
-              <MessageSquare className="h-5 w-5" />
-            </Button>
-
-            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a]">
-              <Plus className="h-5 w-5" />
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                    <AvatarFallback className="bg-[#1d3557] text-[#f3d34a]">JD</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-[#112240] border-[#1d3557] text-white">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-[#1d3557]" />
-                <DropdownMenuItem className="hover:bg-[#1d3557] cursor-pointer">Profile</DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-[#1d3557] cursor-pointer">Settings</DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-[#1d3557] cursor-pointer">My Stories</DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-[#1d3557]" />
-                <DropdownMenuItem className="hover:bg-[#1d3557] cursor-pointer">Log out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+            <Link href="/messages">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Messages
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
+            </Link>
+          </nav>
         </div>
       </header>
 
