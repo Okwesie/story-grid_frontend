@@ -93,7 +93,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 // Auth-related API functions
 export const authApi = {
   register: async (userData: any) => {
-    return fetchApi("/auth/register", {
+    return fetchApi("/user/signUp", {
       method: "POST",
       body: JSON.stringify({ data: userData }),
     })

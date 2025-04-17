@@ -17,6 +17,7 @@ export default function Register() {
     email: "",
     username: "",
     password: "",
+    phoneNumber: "", // Added phoneNumber
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -39,6 +40,7 @@ export default function Register() {
         email: formData.email,
         username: formData.username,
         password: formData.password,
+        phoneNumber: formData.phoneNumber, // Include phoneNumber
       }
 
       // Use the auth context to register the user
@@ -122,6 +124,21 @@ export default function Register() {
               type="password"
               required
               value={formData.password}
+              onChange={handleChange}
+              className="bg-white/10 border-white/20 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber" className="text-white">
+              Phone Number
+            </Label>
+            <Input
+              id="phoneNumber"
+              name="phoneNumber"
+              type="tel"
+              required
+              value={formData.phoneNumber}
               onChange={handleChange}
               className="bg-white/10 border-white/20 text-white"
             />
