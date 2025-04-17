@@ -1,40 +1,70 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function Register() {
   const router = useRouter()
+  const { register } = useAuth()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     username: "",
     password: "",
   })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle registration logic
-    console.log("Registration data:", formData)
-    // Redirect to login after successful registration
-    router.push("/login")
+    setIsLoading(true)
+    setError("")
+
+    try {
+      // Format the data according to your backend's expected structure
+      const userData = {
+        firstName: formData.name.split(" ")[0],
+        lastName: formData.name.split(" ").slice(1).join(" "),
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      }
+
+      // Use the auth context to register the user
+      await register(userData)
+
+      // Show success message
+      alert("Account created successfully! Please log in.")
+
+      // Redirect to login after successful registration
+      router.push("/login")
+    } catch (err) {
+      console.error("Registration error:", err)
+      setError(err instanceof Error ? err.message : "Failed to register. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="min-h-screen bg-[#0a192f] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20 shadow-xl">
         <h1 className="text-2xl font-bold text-center mb-6 text-[#f4ce14]">Create an account</h1>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded text-white text-sm">{error}</div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -97,8 +127,12 @@ export default function Register() {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-[#f4ce14] hover:bg-[#e3bd13] text-[#0a192f] font-semibold">
-            Sign Up
+          <Button
+            type="submit"
+            className="w-full bg-[#f4ce14] hover:bg-[#e3bd13] text-[#0a192f] font-semibold"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing Up..." : "Sign Up"}
           </Button>
         </form>
 
@@ -153,4 +187,3 @@ export default function Register() {
     </div>
   )
 }
-
