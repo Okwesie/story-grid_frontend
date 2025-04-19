@@ -47,11 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuthStatus()
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = async (emailOrUsername: string, password: string) => {
     setIsLoading(true)
     try {
-      const response = await api.auth.login({ email, password })
-      setUser(response.user)
+      const response = await api.auth.login({ email: emailOrUsername, password })
+      setUser(response.user) // Set the logged-in user
       return response
     } finally {
       setIsLoading(false)

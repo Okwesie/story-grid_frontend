@@ -100,7 +100,7 @@ export const authApi = {
   },
 
   login: async (credentials: { email: string; password: string }) => {
-    const response = await fetchApi("/auth/login", {
+    const response = await fetchApi("/user/login", {
       method: "POST",
       body: JSON.stringify({ data: credentials }),
     })
@@ -114,7 +114,7 @@ export const authApi = {
   },
 
   getCurrentUser: async () => {
-    return fetchApi("/auth/user")
+    return fetchApi("/user/login")
   },
 
   logout: async () => {

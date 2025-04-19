@@ -1,38 +1,56 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function Login() {
   const router = useRouter()
+  const { login } = useAuth() // Use the login function from the Auth context
   const [formData, setFormData] = useState({
     emailOrUsername: "",
     password: "",
   })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle login logic
-    console.log("Login data:", formData)
-    // Redirect to dashboard or home after successful login
-    router.push("/dashboard")
+    setIsLoading(true)
+    setError("")
+
+    try {
+      // Call the login function from the Auth context
+      await login(formData.emailOrUsername, formData.password)
+
+      // Redirect to the dashboard or home page after successful login
+      router.push("/dashboard")
+    } catch (err) {
+      console.error("Login error:", err)
+      setError(err instanceof Error ? err.message : "Failed to log in. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="min-h-screen bg-[#0a192f] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20 shadow-xl">
         <h1 className="text-2xl font-bold text-center mb-6 text-[#f4ce14]">Log In</h1>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded text-white text-sm">{error}</div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -65,8 +83,12 @@ export default function Login() {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-[#f4ce14] hover:bg-[#e3bd13] text-[#0a192f] font-semibold">
-            Log In
+          <Button
+            type="submit"
+            className="w-full bg-[#f4ce14] hover:bg-[#e3bd13] text-[#0a192f] font-semibold"
+            disabled={isLoading}
+          >
+            {isLoading ? "Logging In..." : "Log In"}
           </Button>
         </form>
 
