@@ -148,7 +148,7 @@ export default function MessagesPage() {
 
   // Filter conversations based on search query
   const filteredConversations = conversations.filter((conversation) =>
-    conversation.user.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    conversation.user.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   // Handle sending a new message
@@ -159,11 +159,32 @@ export default function MessagesPage() {
         id: messages.length + 1,
         text: newMessage,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        sender: "you",
-        status: "sent",
+        sender: "you" as const,
+        status: "sent" as const,
       }
       setMessages([...messages, newMsg])
       setNewMessage("")
+      
+      // Simulate message delivery and read status
+      setTimeout(() => {
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === newMsg.id 
+              ? { ...msg, status: "delivered" as const }
+              : msg
+          )
+        )
+      }, 1000)
+      
+      setTimeout(() => {
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === newMsg.id 
+              ? { ...msg, status: "read" as const }
+              : msg
+          )
+        )
+      }, 2000)
     }
   }
 
@@ -171,6 +192,9 @@ export default function MessagesPage() {
   const handleSelectConversation = (conversation: Conversation) => {
     setActiveConversation(conversation)
     setShowConversation(true)
+    // Reset messages to conversation-specific messages
+    // In a real app, this would fetch messages for the selected conversation
+    setMessages(sampleMessages)
   }
 
   return (
@@ -202,10 +226,7 @@ export default function MessagesPage() {
                 Explore
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-            </Button>
+            
             <Link href="/messages">
               <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
                 Messages

@@ -211,10 +211,7 @@ export default function Dashboard() {
                 Explore
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-            </Button>
+            
             <Link href="/messages">
               <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
                 Messages
@@ -237,7 +234,7 @@ export default function Dashboard() {
             <p className="text-[#8892b0]">Here's what's happening with your stories</p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-3">
-            <Link href="/create-story">
+            <Link href="/create_story">
               <Button className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Story
