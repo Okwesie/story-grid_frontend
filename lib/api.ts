@@ -14,16 +14,21 @@ export interface User {
 }
 
 export interface Story {
-  id: string
-  title: string
-  content: string
-  authorId: string
-  author?: User
-  createdAt: string
-  updatedAt: string
-  likes?: number
-  comments?: number
-  isLiked?: boolean
+  id: string;
+  title: string;
+  content: string;
+  type: "visual" | "audio" | "video" | "interactive";
+  authorId: string;
+  author?: User;
+  thumbnail?: string;
+  views?: number;
+  likes?: number;
+  comments?: number;
+  timeAgo?: string;
+  lastEdited?: string;
+  createdAt: string;
+  updatedAt: string;
+  isLiked?: boolean;
 }
 
 export interface Comment {
@@ -45,6 +50,17 @@ export interface Friend {
   addressee?: User
   createdAt: string
   updatedAt: string
+}
+
+export interface UserData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  profileImage?: string;
+  stories?: Story[];
+  // Add other user-specific fields your API returns
 }
 
 // Generic fetch function with error handling
@@ -131,8 +147,23 @@ export const authApi = {
 
 // Stories-related API functions
 export const storiesApi = {
-  getAllStories: async (page = 1, limit = 10) => {
-    return fetchApi(`/stories?page=${page}&limit=${limit}`)
+  getAllStories: async (params: { 
+    userId?: string; 
+    status?: 'published' | 'draft';
+    page?: number; 
+    limit?: number 
+  }) => {
+    const queryParams = new URLSearchParams()
+    if (params.userId) queryParams.append('userId', params.userId)
+    if (params.status) queryParams.append('status', params.status)
+    if (params.page) queryParams.append('page', params.page.toString())
+    if (params.limit) queryParams.append('limit', params.limit.toString())
+
+    return fetchApi(`/stories?${queryParams.toString()}`)
+  },
+
+  getRecommendedStories: async () => {
+    return fetchApi('/stories/recommended')
   },
 
   getStoryById: async (id: string) => {
@@ -225,12 +256,32 @@ export const friendsApi = {
   },
 }
 
+export const userApi = {
+  getUserData: async (): Promise<UserData> => {
+    // Remove the extra "api" from the path since it's already in API_BASE_URL
+    return fetchApi("/auth/user", {
+      method: "GET",
+    })
+  }
+}
+
+// Add this to your existing api functions
+export const dashboardApi = {
+  getDashboardData: async () => {
+    return fetchApi("/api/admin/dashboard", {
+      method: "GET",
+    })
+  }
+}
+
 // Export a combined API object for convenience
 export const api = {
   auth: authApi,
   stories: storiesApi,
   comments: commentsApi,
   friends: friendsApi,
+  dashboard: dashboardApi,
+  user: userApi
 }
 
 export default api
