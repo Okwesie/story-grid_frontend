@@ -1,14 +1,11 @@
 // Base URL for your API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"
 
 // Types for better type safety
 export interface User {
   id: string
   username: string
   email: string
-  firstName?: string
-  lastName?: string
-  profileImage?: string
   createdAt: string
   updatedAt: string
 }
@@ -108,10 +105,11 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
 // Auth-related API functions
 export const authApi = {
-  register: async (userData: any) => {
+  register: async (userData: { email: string; username: string; password: string }) => {
     return fetchApi("/user/signUp", {
       method: "POST",
-      body: JSON.stringify({ data: userData }),
+      body: JSON.stringify({ data: userData }), 
+
     })
   },
 
@@ -173,14 +171,14 @@ export const storiesApi = {
   createStory: async (storyData: { title: string; content: string }) => {
     return fetchApi("/stories", {
       method: "POST",
-      body: JSON.stringify({ data: storyData }),
+      body: JSON.stringify(storyData),
     })
   },
 
   updateStory: async (id: string, storyData: { title?: string; content?: string }) => {
     return fetchApi(`/stories/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ data: storyData }),
+      body: JSON.stringify(storyData),
     })
   },
 
@@ -212,14 +210,14 @@ export const commentsApi = {
   addComment: async (storyId: string, content: string) => {
     return fetchApi(`/stories/${storyId}/comments`, {
       method: "POST",
-      body: JSON.stringify({ data: { content } }),
+      body: JSON.stringify({ content }),
     })
   },
 
   updateComment: async (commentId: string, content: string) => {
     return fetchApi(`/comments/${commentId}`, {
       method: "PUT",
-      body: JSON.stringify({ data: { content } }),
+      body: JSON.stringify({ content }),
     })
   },
 
@@ -245,7 +243,7 @@ export const friendsApi = {
   respondToFriendRequest: async (friendId: string, status: "accepted" | "rejected") => {
     return fetchApi(`/friends/${friendId}`, {
       method: "PUT",
-      body: JSON.stringify({ data: { status } }),
+      body: JSON.stringify({ status }),
     })
   },
 
