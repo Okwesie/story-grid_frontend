@@ -98,10 +98,6 @@ export default function ProfilePage() {
                 Explore
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-            </Button>
             <Link href="/messages">
               <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
                 Messages
@@ -205,13 +201,17 @@ export default function ProfilePage() {
 
             {/* Create Story Button */}
             <div className="mb-8">
-              <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
-                <Plus className="h-5 w-5 mr-2" />
-                Create New Story
-              </Button>
+              <Link href = "/create_story">
+                <Button className="w-full bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f] py-6">
+                  <Plus className="h-5 w-5 mr-2" />
+                    Create New Story
+                </Button>
+              </Link>
             </div>
           </div>
-
+         
+          
+          
           {/* Tabs */}
           <Tabs defaultValue="stories" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="bg-[#112240] w-full justify-start">
