@@ -6,58 +6,42 @@ export interface User {
   id: string
   username: string
   email: string
-  createdAt: string
-  updatedAt: string
+  firstName?: string
+  lastName?: string
+  phoneNumber?: string
+  role?: string
+}
+export interface UserData {
+  id: string
+  username: string
+  email: string
+  firstName?: string
+  lastName?: string
+
 }
 
 export interface Story {
-  id: string;
-  title: string;
-  content: string;
-  type: "visual" | "audio" | "video" | "interactive";
-  authorId: string;
-  author?: User;
-  thumbnail?: string;
-  views?: number;
-  likes?: number;
-  comments?: number;
-  timeAgo?: string;
-  lastEdited?: string;
-  createdAt: string;
-  updatedAt: string;
-  isLiked?: boolean;
-}
-
-export interface Comment {
   id: string
+  title: string
   content: string
-  storyId: string
-  authorId: string
+  status: "draft" | "published" | "archived"
+  category?: string
+  tags?: string[]
+  viewCount?: number
+  readTime?: number
+  isFeatured?: boolean
+  publishedAt?: string
+  createdAt: string
+  updatedAt: string
+  userId: string
   author?: User
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Friend {
-  id: string
-  status: "pending" | "accepted" | "rejected"
-  requesterId: string
-  addresseeId: string
-  requester?: User
-  addressee?: User
-  createdAt: string
-  updatedAt: string
-}
-
-export interface UserData {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  username: string;
-  profileImage?: string;
-  stories?: Story[];
-  // Add other user-specific fields your API returns
+  thumbnail?: string
+  type?: "visual" | "audio" | "video" | "interactive"
+  views?: number
+  likes?: number
+  comments?: number
+  timeAgo?: string
+  lastEdited?: string
 }
 
 // Generic fetch function with error handling
@@ -70,11 +54,14 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     token = localStorage.getItem("token")
   }
 
-  // Set default headers
-  const headers = {
-    "Content-Type": "application/json",
+  const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
+  }
+
+  // If not uploading FormData, default Content-Type
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json"
   }
 
   try {
@@ -83,7 +70,6 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
       headers,
     })
 
-    // Handle 204 No Content responses
     if (response.status === 204) {
       return { success: true }
     }
@@ -91,7 +77,6 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     const data = await response.json()
 
     if (!response.ok) {
-      // Format error message from the API
       const errorMessage = data.msg || "Something went wrong"
       throw new Error(errorMessage)
     }
@@ -105,11 +90,10 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
 // Auth-related API functions
 export const authApi = {
-  register: async (userData: { email: string; username: string; password: string }) => {
+  register: async (userData: any) => {
     return fetchApi("/user/signUp", {
       method: "POST",
-      body: JSON.stringify({ data: userData }), 
-
+      body: JSON.stringify({ data: userData }),
     })
   },
 
@@ -119,84 +103,101 @@ export const authApi = {
       body: JSON.stringify({ data: credentials }),
     })
 
-    // Store token in localStorage if available
-    if (response.token) {
-      localStorage.setItem("token", response.token)
+    // Store token if login is successful
+    if (response.data?.token) {
+      localStorage.setItem("token", response.data.token)
     }
 
     return response
   },
 
   getCurrentUser: async () => {
-    return fetchApi("/user/login")
+    return fetchApi("/user/getCurrentUser") // ✅ Corrected the path
   },
 
   logout: async () => {
-    const response = await fetchApi("/auth/logout", {
-      method: "POST",
+    localStorage.removeItem("token") // Just clear token client side
+    return { success: true }
+  },
+}
+
+// User-related API functions
+export const userApi = {
+  getUserData: async () => {
+    return fetchApi("/users/profile")
+  },
+
+  updateProfile: async (userData: any) => {
+    return fetchApi("/users/profile", {
+      method: "PUT",
+      body: JSON.stringify({ data: userData }),
     })
+  },
 
-    // Remove token from localStorage
-    localStorage.removeItem("token")
-
-    return response
+  changePassword: async (passwordData: { currentPassword: string; newPassword: string }) => {
+    return fetchApi("/users/changePassword", {
+      method: "POST",
+      body: JSON.stringify({ data: passwordData }),
+    })
   },
 }
 
 // Stories-related API functions
 export const storiesApi = {
-  getAllStories: async (params: { 
-    userId?: string; 
-    status?: 'published' | 'draft';
-    page?: number; 
-    limit?: number 
-  }) => {
+  getAllStories: async (params: { status?: string; limit?: number; page?: number } = {}) => {
     const queryParams = new URLSearchParams()
-    if (params.userId) queryParams.append('userId', params.userId)
-    if (params.status) queryParams.append('status', params.status)
-    if (params.page) queryParams.append('page', params.page.toString())
-    if (params.limit) queryParams.append('limit', params.limit.toString())
+    if (params.status) queryParams.append("status", params.status)
+    if (params.limit) queryParams.append("limit", params.limit.toString())
+    if (params.page) queryParams.append("page", params.page.toString())
 
-    return fetchApi(`/stories?${queryParams.toString()}`)
-  },
-
-  getRecommendedStories: async () => {
-    return fetchApi('/stories/recommended')
+    return fetchApi(`/story/getStory?${queryParams.toString()}`)
   },
 
   getStoryById: async (id: string) => {
-    return fetchApi(`/stories/${id}`)
-  },
-
-  createStory: async (storyData: { title: string; content: string }) => {
-    return fetchApi("/stories", {
+    return fetchApi("/story/getStory", {
       method: "POST",
-      body: JSON.stringify(storyData),
+      body: JSON.stringify({ data: { id } }),
     })
   },
 
-  updateStory: async (id: string, storyData: { title?: string; content?: string }) => {
-    return fetchApi(`/stories/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(storyData),
+  createStory: async (storyData: any) => {
+    return fetchApi("/story/createStory", {
+      method: "POST",
+      body: JSON.stringify({ data: storyData }),
+    })
+  },
+
+  updateStory: async (storyData: any) => {
+    return fetchApi("/story/updateStory", {
+      method: "POST",
+      body: JSON.stringify({ data: storyData }),
     })
   },
 
   deleteStory: async (id: string) => {
-    return fetchApi(`/stories/${id}`, {
-      method: "DELETE",
+    return fetchApi("/story/deleteStory", {
+      method: "POST",
+      body: JSON.stringify({ data: { id } }),
     })
   },
 
   likeStory: async (storyId: string) => {
-    return fetchApi(`/stories/${storyId}/like`, {
+    return fetchApi("/story/likeStory", {
       method: "POST",
+      body: JSON.stringify({ data: { storyId } }),
     })
   },
 
   unlikeStory: async (storyId: string) => {
-    return fetchApi(`/stories/${storyId}/like`, {
-      method: "DELETE",
+    return fetchApi("/story/unlikeStory", {
+      method: "POST",
+      body: JSON.stringify({ data: { storyId } }),
+    })
+  },
+
+  getRecommendedStories: async () => {
+    return fetchApi("/feed/getDiscover", {
+      method: "POST",
     })
   },
 }
@@ -204,26 +205,23 @@ export const storiesApi = {
 // Comments-related API functions
 export const commentsApi = {
   getStoryComments: async (storyId: string) => {
-    return fetchApi(`/stories/${storyId}/comments`)
-  },
-
-  addComment: async (storyId: string, content: string) => {
-    return fetchApi(`/stories/${storyId}/comments`, {
+    return fetchApi("/story/getComments", {
       method: "POST",
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ data: { storyId } }),
     })
   },
 
-  updateComment: async (commentId: string, content: string) => {
-    return fetchApi(`/comments/${commentId}`, {
-      method: "PUT",
-      body: JSON.stringify({ content }),
+  addComment: async (storyId: string, content: string) => {
+    return fetchApi("/story/commentStory", {
+      method: "POST",
+      body: JSON.stringify({ data: { storyId, content } }),
     })
   },
 
   deleteComment: async (commentId: string) => {
-    return fetchApi(`/comments/${commentId}`, {
-      method: "DELETE",
+    return fetchApi("/story/deleteComment", {
+      method: "POST",
+      body: JSON.stringify({ data: { commentId } }),
     })
   },
 }
@@ -231,55 +229,73 @@ export const commentsApi = {
 // Friends-related API functions
 export const friendsApi = {
   getFriends: async () => {
-    return fetchApi("/friends")
+    return fetchApi("/friend/list")
+  },
+
+  getPendingRequests: async () => {
+    return fetchApi("/friend/pending")
   },
 
   sendFriendRequest: async (friendId: string) => {
-    return fetchApi(`/friends/${friendId}`, {
+    return fetchApi("/friend/request", {
+      method: "POST",
+      body: JSON.stringify({ data: { friendId } }),
+    })
+  },
+
+  acceptFriendRequest: async (friendId: string) => {
+    return fetchApi(`/friend/accept/${friendId}`, {
       method: "POST",
     })
   },
 
-  respondToFriendRequest: async (friendId: string, status: "accepted" | "rejected") => {
-    return fetchApi(`/friends/${friendId}`, {
-      method: "PUT",
-      body: JSON.stringify({ status }),
-    })
-  },
-
-  removeFriend: async (friendId: string) => {
-    return fetchApi(`/friends/${friendId}`, {
+  rejectFriendRequest: async (friendId: string) => {
+    return fetchApi(`/friend/reject/${friendId}`, {
       method: "DELETE",
     })
   },
 }
 
-export const userApi = {
-  getUserData: async (): Promise<UserData> => {
-    // Remove the extra "api" from the path since it's already in API_BASE_URL
-    return fetchApi("/auth/user", {
-      method: "GET",
+// Media-related API functions
+export const mediaApi = {
+  uploadMedia: async (formData: FormData) => {
+    return fetchApi("/media/upload", {
+      method: "POST",
+      body: formData,
+      headers: {}, // Let browser set correct FormData headers
     })
-  }
-}
+  },
 
-// Add this to your existing api functions
-export const dashboardApi = {
-  getDashboardData: async () => {
-    return fetchApi("/api/admin/dashboard", {
-      method: "GET",
+  getUploadParams: async (fileInfo: { filename: string; fileType: string }) => {
+    return fetchApi("/media/getUploadParams", {
+      method: "POST",
+      body: JSON.stringify({ data: fileInfo }),
     })
-  }
+  },
+
+  saveUploadedMedia: async (mediaInfo: any) => {
+    return fetchApi("/media/saveUploadedMedia", {
+      method: "POST",
+      body: JSON.stringify({ data: mediaInfo }),
+    })
+  },
+
+  deleteMedia: async (mediaId: string) => {
+    return fetchApi("/media/delete", {
+      method: "POST",
+      body: JSON.stringify({ data: { mediaId } }),
+    })
+  },
 }
 
 // Export a combined API object for convenience
 export const api = {
   auth: authApi,
+  user: userApi,
   stories: storiesApi,
   comments: commentsApi,
   friends: friendsApi,
-  dashboard: dashboardApi,
-  user: userApi
+  media: mediaApi,
 }
 
 export default api

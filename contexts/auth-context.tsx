@@ -32,7 +32,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const userData = await api.auth.getCurrentUser()
-        setUser(userData.user)
+        if (userData.data?.user) {
+          setUser(userData.data.user)
+        } else if (userData.user) {
+          setUser(userData.user)
+        }
       } catch (error) {
         console.error("Failed to fetch user:", error)
         // Clear invalid token
@@ -47,11 +51,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuthStatus()
   }, [])
 
-  const login = async (emailOrUsername: string, password: string) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      const response = await api.auth.login({ email: emailOrUsername, password })
-      setUser(response.user) // Set the logged-in user
+      const response = await api.auth.login({ email, password })
+      console.log("Login response:", response)
+
+      // Handle the response structure from your API
+      if (response.data?.user) {
+        setUser(response.data.user)
+      } else if (response.user) {
+        setUser(response.user)
+      }
+
       return response
     } finally {
       setIsLoading(false)
@@ -64,6 +76,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await api.auth.logout()
       setUser(null)
       router.push("/login")
+    } catch (error) {
+      console.error("Logout error:", error)
+      // Even if the API call fails, clear the local state
+      setUser(null)
+      localStorage.removeItem("token")
     } finally {
       setIsLoading(false)
     }

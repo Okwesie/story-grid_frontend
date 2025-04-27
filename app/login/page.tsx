@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -11,13 +11,20 @@ import { useAuth } from "@/contexts/auth-context"
 
 export default function Login() {
   const router = useRouter()
-  const { login } = useAuth() // Use the login function from the Auth context
+  const { login, isAuthenticated } = useAuth()
   const [formData, setFormData] = useState({
-    emailOrUsername: "",
+    email: "",
     password: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -31,10 +38,7 @@ export default function Login() {
 
     try {
       // Call the login function from the Auth context
-      await login(formData.emailOrUsername, formData.password)
-
-      // Redirect to the dashboard or home page after successful login
-      router.push("/dashboard")
+      await login(formData.email, formData.password)
     } catch (err) {
       console.error("Login error:", err)
       setError(err instanceof Error ? err.message : "Failed to log in. Please try again.")
@@ -54,15 +58,15 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="emailOrUsername" className="text-white">
-              Email/Username
+            <Label htmlFor="email" className="text-white">
+              Email
             </Label>
             <Input
-              id="emailOrUsername"
-              name="emailOrUsername"
-              type="text"
+              id="email"
+              name="email"
+              type="email"
               required
-              value={formData.emailOrUsername}
+              value={formData.email}
               onChange={handleChange}
               className="bg-white/10 border-white/20 text-white"
             />
@@ -143,4 +147,3 @@ export default function Login() {
     </div>
   )
 }
-
