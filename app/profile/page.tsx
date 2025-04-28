@@ -98,6 +98,10 @@ export default function ProfilePage() {
                 Explore
               </Button>
             </Link>
+            <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </Button>
             <Link href="/messages">
               <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
                 Messages
