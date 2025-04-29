@@ -64,6 +64,8 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     headers["Content-Type"] = "application/json"
   }
 
+  console.log("fetchApi headers:", headers)
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -102,22 +104,19 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify({ data: credentials }),
     })
-
-    // Store token if login is successful
     if (response.data?.token) {
       localStorage.setItem("token", response.data.token)
     }
-
     return response
   },
 
   getCurrentUser: async () => {
-    return fetchApi("/user/getCurrentUser") // ✅ Corrected the path
+    return fetchApi("/auth/user")
   },
 
   logout: async () => {
-    localStorage.removeItem("token") // Just clear token client side
-    return { success: true }
+    localStorage.removeItem("token")
+    return fetchApi("/auth/logout", { method: "POST" })
   },
 }
 
@@ -144,22 +143,6 @@ export const userApi = {
 
 // Stories-related API functions
 export const storiesApi = {
-  getAllStories: async (params: { status?: string; limit?: number; page?: number } = {}) => {
-    const queryParams = new URLSearchParams()
-    if (params.status) queryParams.append("status", params.status)
-    if (params.limit) queryParams.append("limit", params.limit.toString())
-    if (params.page) queryParams.append("page", params.page.toString())
-
-    return fetchApi(`/story/getStory?${queryParams.toString()}`)
-  },
-
-  getStoryById: async (id: string) => {
-    return fetchApi("/story/getStory", {
-      method: "POST",
-      body: JSON.stringify({ data: { id } }),
-    })
-  },
-
   createStory: async (storyData: any) => {
     return fetchApi("/story/createStory", {
       method: "POST",
@@ -167,10 +150,22 @@ export const storiesApi = {
     })
   },
 
-  updateStory: async (storyData: any) => {
-    return fetchApi("/story/updateStory", {
+  getAllStories: async (params: { status?: string; limit?: number; page?: number } = {}) => {
+ 
+    return fetchApi("/story/getDashboardStories", {
+     method: "POST",
+      body: JSON.stringify({ data: params }),
+    })
+  },
+  
+  getDashboardStories: async () => {
+    return fetchApi("/story/getDashboardStories", { method: "POST" })
+  },
+
+  getStoryById: async (id: string) => {
+    return fetchApi("/story/getStory", {
       method: "POST",
-      body: JSON.stringify({ data: storyData }),
+      body: JSON.stringify({ data: { id } }),
     })
   },
 
@@ -228,14 +223,6 @@ export const commentsApi = {
 
 // Friends-related API functions
 export const friendsApi = {
-  getFriends: async () => {
-    return fetchApi("/friend/list")
-  },
-
-  getPendingRequests: async () => {
-    return fetchApi("/friend/pending")
-  },
-
   sendFriendRequest: async (friendId: string) => {
     return fetchApi("/friend/request", {
       method: "POST",
@@ -244,15 +231,23 @@ export const friendsApi = {
   },
 
   acceptFriendRequest: async (friendId: string) => {
-    return fetchApi(`/friend/accept/${friendId}`, {
-      method: "POST",
-    })
+    return fetchApi(`/friend/accept/${friendId}`, { method: "POST" })
+  },
+
+  getPendingRequests: async () => {
+    return fetchApi("/friend/pending")
+  },
+
+  getFriends: async () => {
+    return fetchApi("/friend/list")
   },
 
   rejectFriendRequest: async (friendId: string) => {
-    return fetchApi(`/friend/reject/${friendId}`, {
-      method: "DELETE",
-    })
+    return fetchApi(`/friend/reject/${friendId}`, { method: "DELETE" })
+  },
+
+  removeFriend: async (friendId: string) => {
+    return fetchApi(`/friend/remove/${friendId}`, { method: "DELETE" })
   },
 }
 
@@ -288,14 +283,51 @@ export const mediaApi = {
   },
 }
 
+// Feed-related API functions
+export const feedApi = {
+  getFeed: async () => {
+    return fetchApi("/feed/getFeed", { method: "POST" })
+  },
+  getDiscover: async () => {
+    return fetchApi("/feed/getDiscover", { method: "POST" })
+  },
+}
+
+// Admin-related API functions
+export const adminApi = {
+  getDashboard: async () => {
+    return fetchApi("/admin/dashboard")
+  },
+  getUsers: async () => {
+    return fetchApi("/admin/users")
+  },
+  blockUser: async (userId: string) => {
+    return fetchApi(`/admin/blockUser/${userId}`, { method: "POST" })
+  },
+  unblockUser: async (userId: string) => {
+    return fetchApi(`/admin/unblockUser/${userId}`, { method: "POST" })
+  },
+}
+
+// Utility-related API functions
+export const utilApi = {
+  decrypt: async (data: any) => {
+    return fetchApi("/util/decrypt", {
+      method: "POST",
+      body: JSON.stringify({ data }),
+    })
+  },
+}
+
 // Export a combined API object for convenience
 export const api = {
   auth: authApi,
-  user: userApi,
   stories: storiesApi,
-  comments: commentsApi,
+  feed: feedApi,
   friends: friendsApi,
   media: mediaApi,
+  admin: adminApi,
+  util: utilApi,
 }
 
 export default api

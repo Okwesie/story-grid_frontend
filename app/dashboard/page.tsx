@@ -41,16 +41,16 @@ const getTypeIcon = (type: Story["type"]) => {
 
 export default function Dashboard() {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const [activeTab, setActiveTab] = useState<string>("overview")
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [userData, setUserData] = useState<UserData | null>(null)
   const [recentStories, setRecentStories] = useState<Story[]>([])
   const [draftStories, setDraftStories] = useState<Story[]>([])
   const [recommendedStories, setRecommendedStories] = useState<Story[]>([])
 
   useEffect(() => {
+    console.log("isAuthenticated:", isAuthenticated)
     if (!isAuthenticated) {
       router.push('/login')
       return
@@ -61,19 +61,15 @@ export default function Dashboard() {
       setError(null)
       try {
         const [
-          userDataResponse,
           recentStoriesResponse,
           draftStoriesResponse,
           recommendedStoriesResponse
         ] = await Promise.all([
-          api.user.getUserData(),
           api.stories.getAllStories({ status: 'published', limit: 5 }),
           api.stories.getAllStories({ status: 'draft', limit: 5 }),
           api.stories.getRecommendedStories()
         ])
 
-        // Normalize all responses to use .data if present, else use the root
-        setUserData(userDataResponse)
         setRecentStories(recentStoriesResponse.data?.stories ?? recentStoriesResponse.stories ?? [])
         setDraftStories(draftStoriesResponse.data?.stories ?? draftStoriesResponse.stories ?? [])
         setRecommendedStories(recommendedStoriesResponse.data?.stories ?? recommendedStoriesResponse.stories ?? [])
@@ -87,6 +83,10 @@ export default function Dashboard() {
 
     fetchDashboardData()
   }, [isAuthenticated, router])
+
+  useEffect(() => {
+    console.log("isAuthenticated in dashboard:", isAuthenticated)
+  }, [isAuthenticated])
 
   if (isLoading) {
     return (
@@ -147,7 +147,7 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold text-white">
-              Welcome back, {userData?.firstName || userData?.username || 'User'}
+              Welcome back, {user?.username || 'User'}
             </h2>
             <p className="text-[#8892b0]">Here's what's happening with your stories</p>
           </div>
