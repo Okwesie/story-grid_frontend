@@ -60,19 +60,13 @@ export default function Dashboard() {
       setIsLoading(true)
       setError(null)
       try {
-        const [
-          recentStoriesResponse,
-          draftStoriesResponse,
-          recommendedStoriesResponse
-        ] = await Promise.all([
-          api.stories.getAllStories({ status: 'published', limit: 5 }),
-          api.stories.getAllStories({ status: 'draft', limit: 5 }),
-          api.stories.getRecommendedStories()
-        ])
+        // Single call to get dashboard data
+        const dashboardResponse = await api.stories.getDashboardStories()
+        const recommendedResponse = await api.stories.getRecommendedStories()
 
-        setRecentStories(recentStoriesResponse.data?.stories ?? recentStoriesResponse.stories ?? [])
-        setDraftStories(draftStoriesResponse.data?.stories ?? draftStoriesResponse.stories ?? [])
-        setRecommendedStories(recommendedStoriesResponse.data?.stories ?? recommendedStoriesResponse.stories ?? [])
+        setRecentStories(dashboardResponse.data?.recentPublished ?? [])
+        setDraftStories(dashboardResponse.data?.recentDrafts ?? [])
+        setRecommendedStories(recommendedResponse.data?.stories ?? [])
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error)
         setError(error instanceof Error ? error.message : "Failed to load dashboard data")
