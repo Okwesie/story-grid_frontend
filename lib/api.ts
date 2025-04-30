@@ -139,6 +139,178 @@ export const userApi = {
       body: JSON.stringify({ data: passwordData }),
     })
   },
+
+  // New functions
+  fetchUserProfile: async () => {
+    try {
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        throw new Error("No authentication token found")
+      }
+
+      const response = await fetch("/auth/user", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      const result = await response.json()
+
+      if (result.status === 200) {
+        return {
+          success: true,
+          data: result.data,
+          message: result.msg,
+        }
+      } else {
+        return {
+          success: false,
+          data: null,
+          message: result.msg || "Failed to fetch profile",
+        }
+      }
+    } catch (error) {
+      console.error("API Error:", error)
+      return {
+        success: false,
+        data: null,
+        message: error instanceof Error ? error.message : "An error occurred",
+      }
+    }
+  },
+
+  updateUserProfile: async (updateData: any) => {
+    try {
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        throw new Error("No authentication token found")
+      }
+
+      const response = await fetch("/user/profile", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data: updateData }),
+      })
+
+      const result = await response.json()
+
+      if (result.status === 200) {
+        return {
+          success: true,
+          data: result.data,
+          message: result.msg,
+        }
+      } else {
+        return {
+          success: false,
+          data: null,
+          message: result.msg || "Failed to update profile",
+        }
+      }
+    } catch (error) {
+      console.error("API Error:", error)
+      return {
+        success: false,
+        data: null,
+        message: error instanceof Error ? error.message : "An error occurred",
+      }
+    }
+  },
+
+  changeUserPassword: async (currentPassword: string, newPassword: string) => {
+    try {
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        throw new Error("No authentication token found")
+      }
+
+      const response = await fetch("/user/change-password", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: {
+            currentPassword,
+            newPassword,
+          },
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.status === 200) {
+        return {
+          success: true,
+          data: result.data,
+          message: result.msg,
+        }
+      } else {
+        return {
+          success: false,
+          data: null,
+          message: result.msg || "Failed to change password",
+        }
+      }
+    } catch (error) {
+      console.error("API Error:", error)
+      return {
+        success: false,
+        data: null,
+        message: error instanceof Error ? error.message : "An error occurred",
+      }
+    }
+  },
+
+  logoutUser: async () => {
+    try {
+      const token = localStorage.getItem("token")
+
+      if (token) {
+        const response = await fetch("/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+
+        // Clear token regardless of response
+        localStorage.removeItem("token")
+
+        const result = await response.json()
+
+        return {
+          success: true,
+          message: result.msg || "Logged out successfully",
+        }
+      } else {
+        // No token, just return success
+        return {
+          success: true,
+          message: "Logged out successfully",
+        }
+      }
+    } catch (error) {
+      console.error("API Error:", error)
+      // Still clear token even if API call fails
+      localStorage.removeItem("token")
+
+      return {
+        success: true, // Consider logout successful even if API fails
+        message: "Logged out successfully",
+      }
+    }
+  },
 }
 
 // Stories-related API functions
@@ -285,11 +457,40 @@ export const mediaApi = {
 
 // Feed-related API functions
 export const feedApi = {
-  getFeed: async () => {
-    return fetchApi("/feed/getFeed", { method: "POST" })
+  getFriendsFeed: async (page = 1, limit = 10, sortBy = "createdAt", sortOrder = "DESC") => {
+    return fetchApi("/feed/getFeed", {
+      method: "POST",
+      body: JSON.stringify({
+        data: { page, limit, sortBy, sortOrder },
+      }),
+    })
   },
-  getDiscover: async () => {
-    return fetchApi("/feed/getDiscover", { method: "POST" })
+
+  getDiscoverFeed: async (page = 1, limit = 10) => {
+    return fetchApi("/feed/getDiscover", {
+      method: "POST",
+      body: JSON.stringify({
+        data: { page, limit },
+      }),
+    })
+  },
+
+  toggleLike: async (storyId: string) => {
+    return fetchApi("/story/toggleLike", {
+      method: "POST",
+      body: JSON.stringify({
+        data: { storyId },
+      }),
+    })
+  },
+
+  toggleBookmark: async (storyId: string) => {
+    return fetchApi("/story/toggleBookmark", {
+      method: "POST",
+      body: JSON.stringify({
+        data: { storyId },
+      }),
+    })
   },
 }
 
