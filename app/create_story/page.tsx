@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, ChangeEvent } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 // Media block types
 const BLOCK_TYPES = {
@@ -45,47 +46,39 @@ const BLOCK_TYPES = {
   AUDIO: "audio",
   VIDEO: "video",
   EMBED: "embed",
-} as const
-
-type BlockType = typeof BLOCK_TYPES[keyof typeof BLOCK_TYPES]
-
-interface StoryBlock {
-  id: string;
-  type: BlockType;
-  content: string;
-  caption: string;
-  file: File | null;
-  preview: string | null;
 }
 
 export default function CreateStoryPage() {
-  const [activeStep, setActiveStep] = useState<number>(1)
-  const [storyTitle, setStoryTitle] = useState<string>("")
-  const [storyDescription, setStoryDescription] = useState<string>("")
-  const [coverImage, setCoverImage] = useState<File | null>(null)
-  const [coverImagePreview, setCoverImagePreview] = useState<string>("")
-  const [storyType, setStoryType] = useState<string>("visual")
-  const [tags, setTags] = useState<string[]>([])
-  const [tagInput, setTagInput] = useState<string>("")
-  const [storyBlocks, setStoryBlocks] = useState<StoryBlock[]>([])
-  const [currentBlockType, setCurrentBlockType] = useState<BlockType>(BLOCK_TYPES.TEXT)
-  const [isPublic, setIsPublic] = useState<boolean>(true)
-  const [allowComments, setAllowComments] = useState<boolean>(true)
-  const [isSaving, setIsSaving] = useState<boolean>(false)
-  const [isPublishing, setIsPublishing] = useState<boolean>(false)
-  const [showPreview, setShowPreview] = useState<boolean>(false)
+  const [activeStep, setActiveStep] = useState(1)
+  const [storyTitle, setStoryTitle] = useState("")
+  const [storyDescription, setStoryDescription] = useState("")
+  const [coverImage, setCoverImage] = useState(null)
+  const [coverImagePreview, setCoverImagePreview] = useState("")
+  const [storyType, setStoryType] = useState("visual")
+  const [tags, setTags] = useState([])
+  const [tagInput, setTagInput] = useState("")
+  const [storyBlocks, setStoryBlocks] = useState([])
+  const [currentBlockType, setCurrentBlockType] = useState(BLOCK_TYPES.TEXT)
+  const [isPublic, setIsPublic] = useState(true)
+  const [allowComments, setAllowComments] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const title = storyTitle
+  const router = useRouter()
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const coverImageInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef(null)
+  const coverImageInputRef = useRef(null)
 
   // Handle cover image upload
-  const handleCoverImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleCoverImageUpload = (e) => {
+    const file = e.target.files[0]
     if (file) {
       setCoverImage(file)
       const reader = new FileReader()
       reader.onload = () => {
-        setCoverImagePreview(reader.result as string)
+        setCoverImagePreview(reader.result)
       }
       reader.readAsDataURL(file)
     }
@@ -100,13 +93,13 @@ export default function CreateStoryPage() {
   }
 
   // Handle removing a tag
-  const handleRemoveTag = (tagToRemove: string) => {
+  const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter((tag) => tag !== tagToRemove))
   }
 
   // Handle adding a new block
-  const handleAddBlock = (type: BlockType) => {
-    const newBlock: StoryBlock = {
+  const handleAddBlock = (type) => {
+    const newBlock = {
       id: `block-${Date.now()}`,
       type,
       content: "",
@@ -119,23 +112,23 @@ export default function CreateStoryPage() {
   }
 
   // Handle updating block content
-  const handleUpdateBlockContent = (id: string, content: string) => {
+  const handleUpdateBlockContent = (id, content) => {
     setStoryBlocks(storyBlocks.map((block) => (block.id === id ? { ...block, content } : block)))
   }
 
   // Handle updating block caption
-  const handleUpdateBlockCaption = (id: string, caption: string) => {
+  const handleUpdateBlockCaption = (id, caption) => {
     setStoryBlocks(storyBlocks.map((block) => (block.id === id ? { ...block, caption } : block)))
   }
 
   // Handle file upload for a block
-  const handleFileUpload = (id: string, e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleFileUpload = (id, e) => {
+    const file = e.target.files[0]
     if (file) {
       const reader = new FileReader()
       reader.onload = () => {
         setStoryBlocks(
-          storyBlocks.map((block) => (block.id === id ? { ...block, file, preview: reader.result as string } : block)),
+          storyBlocks.map((block) => (block.id === id ? { ...block, file, preview: reader.result } : block)),
         )
       }
       reader.readAsDataURL(file)
@@ -143,12 +136,12 @@ export default function CreateStoryPage() {
   }
 
   // Handle removing a block
-  const handleRemoveBlock = (id: string) => {
+  const handleRemoveBlock = (id) => {
     setStoryBlocks(storyBlocks.filter((block) => block.id !== id))
   }
 
   // Handle moving a block up or down
-  const handleMoveBlock = (id: string, direction: "up" | "down") => {
+  const handleMoveBlock = (id, direction) => {
     const index = storyBlocks.findIndex((block) => block.id === id)
     if ((direction === "up" && index === 0) || (direction === "down" && index === storyBlocks.length - 1)) {
       return
@@ -161,30 +154,118 @@ export default function CreateStoryPage() {
     setStoryBlocks(newBlocks)
   }
 
+  async function createStory(storyData, token) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL
+    const response = await fetch(`${apiUrl}/stories`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(storyData),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Failed to create story")
+    }
+
+    return response.json()
+  }
+
   // Handle saving as draft
-  const handleSaveAsDraft = () => {
-    setIsSaving(true)
-    // Simulate API call
-    setTimeout(() => {
+  async function handleSaveAsDraft() {
+    try {
+      setIsSaving(true)
+      setErrorMessage("")
+
+      const token = localStorage.getItem("token")
+      if (!token) {
+        setErrorMessage("You must be logged in to save a story")
+        return
+      }
+
+      // Prepare the story data in the format expected by the backend
+      const storyData = {
+        title,
+        content: storyDescription, // Backend expects 'content' instead of 'description'
+        category: storyType,
+        tags,
+        status: "draft",
+        media: storyBlocks
+          .filter((block) => block.file)
+          .map((block, index) => ({
+            type: block.type,
+            url: block.preview,
+            order: index,
+            metadata: {
+              caption: block.caption,
+            },
+          })),
+      }
+
+      const response = await createStory(storyData, token)
+      if (response.id) {
+        router.push(`/stories/${response.id}`)
+      } else {
+        throw new Error(response.msg || "Failed to save story")
+      }
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "An error occurred while saving the story")
+    } finally {
       setIsSaving(false)
-      // Show success message or redirect
-      alert("Story saved as draft!")
-    }, 1500)
+    }
   }
 
   // Handle publishing
-  const handlePublish = () => {
-    setIsPublishing(true)
-    // Simulate API call
-    setTimeout(() => {
+  async function handlePublish() {
+    try {
+      setIsPublishing(true)
+      setErrorMessage("")
+
+      // Get the token from localStorage
+      const token = localStorage.getItem("token")
+      if (!token) {
+        setErrorMessage("You must be logged in to publish a story")
+        return
+      }
+
+      // Prepare the story data in the format expected by the backend
+      const storyData = {
+        title,
+        content: storyDescription, // Backend expects 'content' instead of 'description'
+        category: storyType,
+        tags,
+        status: "published",
+        media: storyBlocks
+          .filter((block) => block.file)
+          .map((block, index) => ({
+            type: block.type,
+            url: block.preview,
+            order: index,
+            metadata: {
+              caption: block.caption,
+            },
+          })),
+      }
+
+      // Create story
+      const response = await createStory(storyData, token)
+      if (response.id) {
+        // Redirect to the new story
+        router.push(`/stories/${response.id}`)
+      } else {
+        throw new Error(response.msg || "Failed to create story")
+      }
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "An error occurred while publishing the story")
+    } finally {
       setIsPublishing(false)
-      // Show success message or redirect
-      alert("Story published successfully!")
-    }, 1500)
+    }
   }
 
   // Render block based on type
-  const renderBlock = (block: StoryBlock, index: number) => {
+  const renderBlock = (block, index) => {
     switch (block.type) {
       case BLOCK_TYPES.TEXT:
         return (
@@ -300,9 +381,9 @@ export default function CreateStoryPage() {
                   <div className="flex items-center gap-3">
                     <Music className="h-8 w-8 text-[#f3d34a]" />
                     <div>
-                      <p className="text-white font-medium truncate max-w-[200px]">{block.file?.name}</p>
+                      <p className="text-white font-medium truncate max-w-[200px]">{block.file.name}</p>
                       <p className="text-xs text-[#8892b0]">
-                        Audio file ({block.file ? (block.file.size / (1024 * 1024)).toFixed(2) : '0.00'} MB)
+                        Audio file ({(block.file.size / (1024 * 1024)).toFixed(2)} MB)
                       </p>
                     </div>
                   </div>
@@ -319,7 +400,7 @@ export default function CreateStoryPage() {
                   </Button>
                 </div>
                 <audio controls className="w-full">
-                  <source src={block.preview} type={block.file?.type} />
+                  <source src={block.preview} type={block.file.type} />
                   Your browser does not support the audio element.
                 </audio>
               </div>

@@ -44,7 +44,8 @@ import {
 } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { feedApi } from "@/lib/api"
+import { Story as StoryType, StoryData } from "@/types/api"
+import { getStories } from "@/api/story-service"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 
@@ -90,12 +91,12 @@ export default function ExplorePage() {
   const router = useRouter()
   // State
   const [activeTab, setActiveTab] = useState("friends")
-  const [stories, setStories] = useState<Story[]>([])
+  const [stories, setStories] = useState<StoryType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
-  const [error, setError] = useState("")
   const [sortBy, setSortBy] = useState("createdAt")
   const [sortOrder, setSortOrder] = useState("DESC")
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -104,7 +105,7 @@ export default function ExplorePage() {
   const [viewMode, setViewMode] = useState("grid")
 
   // Infinite scroll setup
-  const { ref: loadMoreRef, inView } = useInView({
+  const { ref, inView } = useInView({
     threshold: 0.5,
     triggerOnce: false,
   })
@@ -115,62 +116,46 @@ export default function ExplorePage() {
     setPage(1)
     setHasMore(true)
     setIsInitialLoading(true)
-    setError("")
+    setError(null)
   }, [activeTab, sortBy, sortOrder, selectedTags.length])
 
   // Fetch stories
   const fetchStories = useCallback(async () => {
-    if (!hasMore || isLoading) return
-
-    setIsLoading(true)
-    setError("")
-
     try {
-      let response
-
-      if (activeTab === "friends") {
-        response = await feedApi.getFriendsFeed(page, 10, sortBy, sortOrder)
+      setLoading(true)
+      const response = await getStories(page, 10)
+      
+      if (response.success && response.data) {
+        const newStories = response.data
+        if (Array.isArray(newStories)) {
+          setStories(prev => [...prev, ...newStories])
+          setHasMore(newStories.length === 10)
+        } else {
+          setError("Invalid stories data format")
+        }
       } else {
-        response = await feedApi.getDiscoverFeed(page, 10)
-      }
-
-      if (response.status === 200) {
-        const newStories = response.data.stories
-
-        // Filter by tags if any are selected
-        const filteredStories = selectedTags.length
-          ? newStories.filter((story: Story) => {
-              // This is a placeholder - in a real app, you'd check if the story has any of the selected tags
-              // For now, we'll just simulate this with a random check
-              return Math.random() > 0.3
-            })
-          : newStories
-
-        setStories((prev) => (page === 1 ? filteredStories : [...prev, ...filteredStories]))
-        setHasMore(page < response.data.pagination.pages)
-      } else {
-        setError(response.msg || "Failed to load stories")
+        setError(response.message || "Failed to fetch stories")
       }
     } catch (err) {
-      console.error("Error fetching stories:", err)
-      setError("Failed to load stories. Please try again.")
+      setError("Failed to fetch stories")
+      console.error(err)
     } finally {
-      setIsLoading(false)
+      setLoading(false)
       setIsInitialLoading(false)
     }
-  }, [activeTab, page, sortBy, sortOrder, hasMore, isLoading, selectedTags])
+  }, [page])
 
   // Initial load and pagination
   useEffect(() => {
     fetchStories()
-  }, [fetchStories, page])
+  }, [fetchStories])
 
   // Load more when scrolled to bottom
   useEffect(() => {
-    if (inView && !isLoading && hasMore) {
-      setPage((prevPage) => prevPage + 1)
+    if (inView && hasMore && !loading) {
+      setPage(prev => prev + 1)
     }
-  }, [inView, isLoading, hasMore])
+  }, [inView, hasMore, loading])
 
   // Handle like toggle
   const handleLikeToggle = (storyId: string) => {
@@ -209,7 +194,7 @@ export default function ExplorePage() {
     setPage(1)
     setHasMore(true)
     setIsInitialLoading(true)
-    setError("")
+    setError(null)
   }
 
   // Navigation handlers
@@ -678,7 +663,7 @@ export default function ExplorePage() {
         </Tabs>
 
         {/* Loading More Indicator */}
-        {isLoading && !isInitialLoading && (
+        {loading && !isInitialLoading && (
           <div className="flex justify-center my-8">
             <div className="flex items-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin text-[#f3d34a]" />
@@ -688,7 +673,7 @@ export default function ExplorePage() {
         )}
 
         {/* Load More Trigger */}
-        {hasMore && !isLoading && <div ref={loadMoreRef} className="h-10" />}
+        {hasMore && !loading && <div ref={ref} className="h-10" />}
 
         {/* End of Feed Message */}
         {!hasMore && stories.length > 0 && (
@@ -705,7 +690,7 @@ export default function ExplorePage() {
 }
 
 // Story Card Component for Grid View
-function StoryCard({ story, onLike, onBookmark }: { story: Story; onLike: any; onBookmark: any }) {
+function StoryCard({ story, onLike, onBookmark }: { story: StoryType; onLike: any; onBookmark: any }) {
   const [isHovered, setIsHovered] = useState(false)
 
   // Get primary media for display
@@ -972,7 +957,7 @@ function StoryCard({ story, onLike, onBookmark }: { story: Story; onLike: any; o
 }
 
 // Story List Item Component for List View
-function StoryListItem({ story, onLike, onBookmark }: { story: Story; onLike: any; onBookmark: any }) {
+function StoryListItem({ story, onLike, onBookmark }: { story: StoryType; onLike: any; onBookmark: any }) {
   // Get primary media for display
   const primaryMedia = story.media && story.media.length > 0 ? story.media[0] : null
 

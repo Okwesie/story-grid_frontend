@@ -348,7 +348,7 @@ export default function ProfilePage() {
               <AvatarFallback className="bg-[#112240] text-[#f3d34a] text-4xl font-bold">
                 {profile.firstName?.charAt(0) || profile.username?.charAt(0) || "U"}
               </AvatarFallback>
-            </Avatar>
+          </Avatar>
             <button className="absolute bottom-2 right-2 bg-[#f3d34a] text-[#0a192f] rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <Camera className="h-5 w-5" />
             </button>
@@ -398,23 +398,23 @@ export default function ProfilePage() {
                     <Mail className="h-4 w-4" />
                   </div>
                   <span>{profile.email}</span>
-                </div>
+            </div>
               )}
               {profile.country && (
                 <div className="flex items-center gap-2 text-[#8892b0] hover:text-[#f3d34a] transition-colors group">
                   <div className="bg-[#112240] p-2 rounded-full group-hover:bg-[#1d3557] transition-colors">
-                    <MapPin className="h-4 w-4" />
-                  </div>
+                <MapPin className="h-4 w-4" />
+              </div>
                   <span>{profile.country}</span>
-                </div>
+              </div>
               )}
               {profile.createdAt && (
                 <div className="flex items-center gap-2 text-[#8892b0] hover:text-[#f3d34a] transition-colors group">
                   <div className="bg-[#112240] p-2 rounded-full group-hover:bg-[#1d3557] transition-colors">
-                    <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4" />
                   </div>
                   <span>Member since {formatDate(profile.createdAt)}</span>
-                </div>
+              </div>
               )}
             </div>
           </div>
@@ -426,9 +426,9 @@ export default function ProfilePage() {
                 className="border-[#f3d34a] text-[#f3d34a] hover:bg-[#f3d34a]/10 rounded-full px-6"
                 onClick={() => setIsEditing(true)}
               >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
             ) : (
               <div className="flex gap-2">
                 <Button
@@ -464,7 +464,7 @@ export default function ProfilePage() {
                       Save Changes
                     </>
                   )}
-                </Button>
+            </Button>
               </div>
             )}
           </div>
@@ -475,7 +475,7 @@ export default function ProfilePage() {
           {!isEditing ? (
             <div className="bg-[#112240]/50 p-6 rounded-xl border border-[#1d3557] backdrop-blur-sm">
               <p className="text-[#8892b0] leading-relaxed">{profile.bio}</p>
-            </div>
+        </div>
           ) : (
             <div className="space-y-2">
               <Label htmlFor="bio" className="text-white">
@@ -489,7 +489,7 @@ export default function ProfilePage() {
                 className="min-h-[120px] bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a] rounded-xl"
                 placeholder="Tell us about yourself"
               />
-            </div>
+          </div>
           )}
         </div>
 
@@ -655,7 +655,7 @@ export default function ProfilePage() {
                         <p className="mt-2 text-white text-lg">{formatDate(profile.createdAt)}</p>
                       </div>
                     </div>
-                  </div>
+            </div>
                 )}
               </CardContent>
               {!isEditing && (
@@ -701,8 +701,8 @@ export default function ProfilePage() {
                         onChange={handlePasswordChange}
                         className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a] h-12 rounded-lg"
                         required
-                      />
-                    </div>
+              />
+            </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -717,8 +717,8 @@ export default function ProfilePage() {
                           onChange={handlePasswordChange}
                           className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a] h-12 rounded-lg"
                           required
-                        />
-                      </div>
+              />
+            </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="confirmPassword" className="text-white">
@@ -732,10 +732,10 @@ export default function ProfilePage() {
                           onChange={handlePasswordChange}
                           className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a] h-12 rounded-lg"
                           required
-                        />
-                      </div>
-                    </div>
-                  </div>
+              />
+            </div>
+      </div>
+    </div>
 
                   <div className="flex justify-end">
                     <Button
@@ -755,7 +755,7 @@ export default function ProfilePage() {
                         </>
                       )}
                     </Button>
-                  </div>
+        </div>
                 </form>
 
                 <Separator className="my-8 bg-[#1d3557]" />
@@ -770,9 +770,9 @@ export default function ProfilePage() {
                       <p className="text-[#8892b0]">
                         Enhance your account security by enabling two-factor authentication.
                       </p>
-                    </div>
+      </div>
                     <Badge className="bg-red-500/20 text-red-400 px-3 py-1">Disabled</Badge>
-                  </div>
+        </div>
                   <div className="bg-[#1d3557]/30 p-6 rounded-xl border border-[#1d3557] mt-4">
                     <p className="text-[#8892b0] mb-4">
                       Two-factor authentication adds an extra layer of security to your account by requiring a code from
@@ -785,10 +785,10 @@ export default function ProfilePage() {
                       <Shield className="h-4 w-4 mr-2" />
                       Enable 2FA
                     </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
           </TabsContent>
 
           {/* Account Tab */}
@@ -814,35 +814,35 @@ export default function ProfilePage() {
                       </h3>
                       <p className="text-[#8892b0] mt-1">Your current subscription plan</p>
                     </div>
-                  </div>
+        </div>
 
                   <div className="bg-[#1d3557]/30 p-6 rounded-xl border border-[#1d3557]">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h4 className="text-lg font-medium text-white">Free Account</h4>
                         <p className="text-[#8892b0]">Basic features and limited storage</p>
-                      </div>
+            </div>
                       <Badge className="bg-[#f3d34a] text-[#0a192f] px-3 py-1">Active</Badge>
-                    </div>
+        </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <div className="flex items-center gap-2 text-[#8892b0]">
                         <Check className="h-4 w-4 text-[#f3d34a]" />
                         <span>5 stories per month</span>
-                      </div>
+          </div>
                       <div className="flex items-center gap-2 text-[#8892b0]">
                         <Check className="h-4 w-4 text-[#f3d34a]" />
                         <span>Basic analytics</span>
-                      </div>
+        </div>
                       <div className="flex items-center gap-2 text-[#8892b0]">
                         <Check className="h-4 w-4 text-[#f3d34a]" />
                         <span>Standard support</span>
-                      </div>
+          </div>
                       <div className="flex items-center gap-2 text-[#8892b0]">
                         <Check className="h-4 w-4 text-[#f3d34a]" />
                         <span>500MB storage</span>
-                      </div>
-                    </div>
+              </div>
+            </div>
 
                     <Button
                       variant="outline"
@@ -851,8 +851,8 @@ export default function ProfilePage() {
                       <Sparkles className="h-4 w-4 mr-2" />
                       Upgrade to Pro
                     </Button>
-                  </div>
-                </div>
+          </div>
+        </div>
 
                 <Separator className="bg-[#1d3557]" />
 
@@ -897,16 +897,16 @@ export default function ProfilePage() {
                         <LogOut className="h-4 w-4 mr-2" />
                         Log Out
                       </Button>
-                    </div>
-                  </div>
+        </div>
+              </div>
 
                   <div className="bg-red-950/20 p-6 rounded-xl border border-red-900/50 mt-4">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="bg-red-950 p-3 rounded-lg">
                         <Trash2 className="h-5 w-5 text-red-400" />
-                      </div>
+          </div>
                       <h4 className="text-lg font-medium text-white">Delete Account</h4>
-                    </div>
+        </div>
                     <p className="text-[#8892b0] mb-4">
                       Permanently delete your account and all associated data. This action cannot be undone.
                     </p>
@@ -921,10 +921,10 @@ export default function ProfilePage() {
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete Account
                     </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
           </TabsContent>
         </Tabs>
       </div>

@@ -11,19 +11,66 @@ export interface User {
   phoneNumber?: string
   role?: string
 }
+
 export interface UserData {
   id: string
   username: string
   email: string
   firstName?: string
   lastName?: string
+}
 
+// Media related types
+export interface MediaData {
+  url: string
+  type: string
+  mediaId?: string
+  metadata?: {
+    publicId?: string
+    format?: string
+    size?: number
+    width?: number
+    height?: number
+    resourceType?: string
+  }
+}
+
+export interface UploadParams {
+  data: {
+    cloudName: string
+    apiKey: string
+    uploadParams: {
+      timestamp: number
+      folder: string
+      public_id?: string
+      signature: string
+    }
+    uploadUrl: string
+  }
+}
+
+// Story related types
+export interface StoryBlock {
+  type: string
+  content: string
+  caption?: string
+  mediaId?: string
+}
+
+export interface StoryData {
+  title: string
+  description?: string
+  tags?: string[]
+  coverImage?: MediaData
+  blocks?: StoryBlock[]
+  isDraft?: boolean
 }
 
 export interface Story {
   id: string
   title: string
-  content: string
+  content?: string
+  description?: string
   status: "draft" | "published" | "archived"
   category?: string
   tags?: string[]
@@ -33,15 +80,35 @@ export interface Story {
   publishedAt?: string
   createdAt: string
   updatedAt: string
-  userId: string
-  author?: User
+  userId?: string
+  author?: {
+    id: string
+    username: string
+  }
   thumbnail?: string
+  coverImage?: MediaData
+  blocks?: StoryBlock[]
   type?: "visual" | "audio" | "video" | "interactive"
   views?: number
   likes?: number
   comments?: number
   timeAgo?: string
   lastEdited?: string
+}
+
+// API response types
+export interface ApiResponse<T> {
+  success: boolean
+  data: T | null
+  message: string
+}
+
+export interface ApiError extends Error {
+  response?: {
+    data?: {
+      msg?: string
+    }
+  }
 }
 
 // Generic fetch function with error handling
@@ -315,7 +382,7 @@ export const userApi = {
 
 // Stories-related API functions
 export const storiesApi = {
-  createStory: async (storyData: any) => {
+  createStory: async (storyData: StoryData) => {
     return fetchApi("/story/createStory", {
       method: "POST",
       body: JSON.stringify({ data: storyData }),
@@ -323,13 +390,12 @@ export const storiesApi = {
   },
 
   getAllStories: async (params: { status?: string; limit?: number; page?: number } = {}) => {
- 
     return fetchApi("/story/getDashboardStories", {
-     method: "POST",
+      method: "POST",
       body: JSON.stringify({ data: params }),
     })
   },
-  
+
   getDashboardStories: async () => {
     return fetchApi("/story/getDashboardStories", { method: "POST" })
   },
@@ -433,10 +499,10 @@ export const mediaApi = {
     })
   },
 
-  getUploadParams: async (fileInfo: { filename: string; fileType: string }) => {
+  getUploadParams: async (fileName: string, fileType: string) => {
     return fetchApi("/media/getUploadParams", {
       method: "POST",
-      body: JSON.stringify({ data: fileInfo }),
+      body: JSON.stringify({ data: { fileName, fileType } }),
     })
   },
 
