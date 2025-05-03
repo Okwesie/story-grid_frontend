@@ -210,7 +210,8 @@ export default function CreateStoryPage() {
         content: content || storyDescription,
         category: "story",
         tags: tags,
-        media: media
+        media: media,
+        status: 'draft'
       };
 
       // First, upload all media files
