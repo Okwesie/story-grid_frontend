@@ -89,7 +89,7 @@ export default function DraftsClient() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Drafts</h1>
-        <Link href="/create-story">
+        <Link href="/create_story">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             New Story
@@ -100,7 +100,7 @@ export default function DraftsClient() {
       {drafts.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 bg-muted/50 rounded-lg">
           <p className="text-gray-500 mb-4">You don't have any drafts yet.</p>
-          <Link href="/create-story">
+          <Link href="/create_story">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Story

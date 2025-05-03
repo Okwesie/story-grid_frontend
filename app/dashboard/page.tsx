@@ -322,7 +322,7 @@ export default function Dashboard() {
                       <div className="text-center py-8">
                         <ImageIcon className="h-12 w-12 mx-auto text-[#8892b0] mb-3 opacity-50" />
                         <p className="text-[#8892b0]">You haven't published any stories yet.</p>
-                        <Link href="/create-story">
+                        <Link href="/create_story">
                           <Button className="mt-4 bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
                             Create Your First Story
                           </Button>
@@ -402,7 +402,7 @@ export default function Dashboard() {
                         </div>
                       ))
                     )}
-                    <Link href="/create-story">
+                    <Link href="/create_story">
                       <Button
                         variant="outline"
                         className="w-full border-dashed border-[#1d3557] text-[#8892b0] hover:bg-[#1d3557] hover:text-white"
