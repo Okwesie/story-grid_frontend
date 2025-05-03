@@ -92,11 +92,11 @@ export default function Dashboard() {
 
         // Calculate total stats from recent stories
         const totalViews =
-          dashboardResponse.data?.recentPublished?.reduce((sum, story) => sum + (story.views || 0), 0) || 0
+          dashboardResponse.data?.recentPublished?.reduce((sum: number, story: Story) => sum + (story.views || 0), 0) || 0
         const totalLikes =
-          dashboardResponse.data?.recentPublished?.reduce((sum, story) => sum + (story.likes || 0), 0) || 0
+          dashboardResponse.data?.recentPublished?.reduce((sum: number, story: Story) => sum + (story.likes || 0), 0) || 0
         const totalComments =
-          dashboardResponse.data?.recentPublished?.reduce((sum, story) => sum + (story.comments || 0), 0) || 0
+          dashboardResponse.data?.recentPublished?.reduce((sum: number, story: Story) => sum + (story.comments || 0), 0) || 0
 
         setStats({
           views: totalViews,
@@ -181,9 +181,12 @@ export default function Dashboard() {
               </Button>
             </Link>
             <Link href="/profile">
-              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
-                Profile
-              </Button>
+              <Avatar className="h-8 w-8 cursor-pointer">
+                <AvatarImage src="/placeholder.svg?height=32&width=32" alt={user?.username || "User"} />
+                <AvatarFallback className="bg-[#1d3557] text-[#f3d34a]">
+                  {user?.username ? user.username[0].toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
             </Link>
           </nav>
         </div>
@@ -197,7 +200,7 @@ export default function Dashboard() {
             <p className="text-[#8892b0]">Here's what's happening with your stories</p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-3">
-            <Link href="/create-story">
+            <Link href="/create_story">
               <Button className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Story
@@ -536,8 +539,7 @@ export default function Dashboard() {
                           </div>
                           <Progress
                             value={(typeCount.visual / total) * 100}
-                            className="h-2 bg-[#1d3557]"
-                            indicatorClassName="bg-[#f3d34a]"
+                            className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]"
                           />
                         </div>
 
@@ -551,8 +553,7 @@ export default function Dashboard() {
                           </div>
                           <Progress
                             value={(typeCount.audio / total) * 100}
-                            className="h-2 bg-[#1d3557]"
-                            indicatorClassName="bg-[#f3d34a]"
+                            className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]"
                           />
                         </div>
 
@@ -566,8 +567,7 @@ export default function Dashboard() {
                           </div>
                           <Progress
                             value={(typeCount.video / total) * 100}
-                            className="h-2 bg-[#1d3557]"
-                            indicatorClassName="bg-[#f3d34a]"
+                            className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]"
                           />
                         </div>
 
@@ -581,8 +581,7 @@ export default function Dashboard() {
                           </div>
                           <Progress
                             value={(typeCount.interactive / total) * 100}
-                            className="h-2 bg-[#1d3557]"
-                            indicatorClassName="bg-[#f3d34a]"
+                            className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]"
                           />
                         </div>
                       </>
@@ -755,28 +754,28 @@ export default function Dashboard() {
                           <span>18-24</span>
                           <span>28%</span>
                         </div>
-                        <Progress value={28} className="h-2 bg-[#1d3557]" indicatorClassName="bg-[#f3d34a]" />
+                        <Progress value={28} className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]" />
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <span>25-34</span>
                           <span>42%</span>
                         </div>
-                        <Progress value={42} className="h-2 bg-[#1d3557]" indicatorClassName="bg-[#f3d34a]" />
+                        <Progress value={42} className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]" />
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <span>35-44</span>
                           <span>18%</span>
                         </div>
-                        <Progress value={18} className="h-2 bg-[#1d3557]" indicatorClassName="bg-[#f3d34a]" />
+                        <Progress value={18} className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]" />
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <span>45+</span>
                           <span>12%</span>
                         </div>
-                        <Progress value={12} className="h-2 bg-[#1d3557]" indicatorClassName="bg-[#f3d34a]" />
+                        <Progress value={12} className="h-2 bg-[#1d3557] [&::-webkit-progress-bar]:bg-[#f3d34a]" />
                       </div>
                     </div>
 

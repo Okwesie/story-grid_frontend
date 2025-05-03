@@ -45,7 +45,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Story as StoryType, StoryData } from "@/types/api"
-import { getStories } from "@/api/story-service"
+import { storiesApi } from "@/lib/api"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 
@@ -82,9 +82,21 @@ interface PaginationInfo {
   pages: number
 }
 
-interface FeedResponse {
-  stories: Story[]
-  pagination: PaginationInfo
+interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+interface FetchStoriesResponse {
+  success: boolean;
+  data: {
+    stories: StoryType[];
+    pagination: {
+      total: number;
+      page: number;
+      pages: number;
+    };
+  };
 }
 
 export default function ExplorePage() {
@@ -120,42 +132,59 @@ export default function ExplorePage() {
   }, [activeTab, sortBy, sortOrder, selectedTags.length])
 
   // Fetch stories
-  const fetchStories = useCallback(async () => {
+  const fetchStories = async ({ page, limit }: PaginationParams): Promise<FetchStoriesResponse> => {
     try {
-      setLoading(true)
-      const response = await getStories(page, 10)
+      const response = await storiesApi.getRecommendedStories();
       
-      if (response.success && response.data) {
-        const newStories = response.data
-        if (Array.isArray(newStories)) {
-          setStories(prev => [...prev, ...newStories])
-          setHasMore(newStories.length === 10)
-        } else {
-          setError("Invalid stories data format")
+      // Ensure we have an array of stories, even if empty
+      const stories = Array.isArray(response.data) ? response.data : [];
+      
+      return {
+        success: true,
+        data: {
+          stories,
+          pagination: {
+            total: stories.length,
+            page: 1,
+            pages: 1
+          }
         }
+      };
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      throw error;
+    }
+  };
+
+  const loadStories = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchStories({ page, limit: 10 });
+      
+      if (response.success && response.data?.stories) {
+        setStories(response.data.stories); // Replace existing stories
+        setHasMore(false); // Since we're getting all stories at once
       } else {
-        setError(response.message || "Failed to fetch stories")
+        setStories([]); // Set empty array if no stories
       }
     } catch (err) {
-      setError("Failed to fetch stories")
-      console.error(err)
+      setError(err instanceof Error ? err.message : "Failed to load stories");
+      setStories([]); // Set empty array on error
     } finally {
-      setLoading(false)
-      setIsInitialLoading(false)
+      setLoading(false);
+      setIsInitialLoading(false);
     }
-  }, [page])
+  };
 
-  // Initial load and pagination
   useEffect(() => {
-    fetchStories()
-  }, [fetchStories])
+    loadStories();
+  }, [page]);
 
-  // Load more when scrolled to bottom
-  useEffect(() => {
-    if (inView && hasMore && !loading) {
-      setPage(prev => prev + 1)
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      setPage(prev => prev + 1);
     }
-  }, [inView, hasMore, loading])
+  };
 
   // Handle like toggle
   const handleLikeToggle = (storyId: string) => {
@@ -568,96 +597,86 @@ export default function ExplorePage() {
           )}
 
           <TabsContent value="friends" className="mt-0">
-            {isInitialLoading ? (
+            {loading && isInitialLoading ? (
               <StoryGridSkeleton viewMode={viewMode} />
-            ) : stories.length === 0 ? (
+            ) : error ? (
               <EmptyState
-                title="No stories found"
-                description={
-                  activeTab === "friends"
-                    ? "Follow more creators to see their stories in your feed"
-                    : "Try different filters or check back later for new content"
-                }
+                title="Error Loading Stories"
+                description={error}
+              />
+            ) : !stories || stories.length === 0 ? (
+              <EmptyState
+                title="No Stories Found"
+                description="There are no stories to display at the moment."
               />
             ) : (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`friends-${viewMode}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {viewMode === "grid" ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {stories.map((story) => (
-                        <StoryCard
-                          key={story.id}
-                          story={story}
-                          onLike={handleLikeToggle}
-                          onBookmark={handleBookmarkToggle}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {stories.map((story) => (
-                        <StoryListItem
-                          key={story.id}
-                          story={story}
-                          onLike={handleLikeToggle}
-                          onBookmark={handleBookmarkToggle}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+              <div className="mt-8">
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {stories.map((story) => (
+                      <StoryCard
+                        key={story.id}
+                        story={story}
+                        onLike={handleLikeToggle}
+                        onBookmark={handleBookmarkToggle}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {stories.map((story) => (
+                      <StoryListItem
+                        key={story.id}
+                        story={story}
+                        onLike={handleLikeToggle}
+                        onBookmark={handleBookmarkToggle}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </TabsContent>
 
           <TabsContent value="discover" className="mt-0">
-            {isInitialLoading ? (
+            {loading && isInitialLoading ? (
               <StoryGridSkeleton viewMode={viewMode} />
-            ) : stories.length === 0 ? (
+            ) : error ? (
               <EmptyState
-                title="No trending stories found"
-                description="Try different filters or check back later for new content"
+                title="Error Loading Stories"
+                description={error}
+              />
+            ) : !stories || stories.length === 0 ? (
+              <EmptyState
+                title="No Stories Found"
+                description="There are no stories to display at the moment."
               />
             ) : (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`discover-${viewMode}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {viewMode === "grid" ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {stories.map((story) => (
-                        <StoryCard
-                          key={story.id}
-                          story={story}
-                          onLike={handleLikeToggle}
-                          onBookmark={handleBookmarkToggle}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {stories.map((story) => (
-                        <StoryListItem
-                          key={story.id}
-                          story={story}
-                          onLike={handleLikeToggle}
-                          onBookmark={handleBookmarkToggle}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+              <div className="mt-8">
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {stories.map((story) => (
+                      <StoryCard
+                        key={story.id}
+                        story={story}
+                        onLike={handleLikeToggle}
+                        onBookmark={handleBookmarkToggle}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {stories.map((story) => (
+                      <StoryListItem
+                        key={story.id}
+                        story={story}
+                        onLike={handleLikeToggle}
+                        onBookmark={handleBookmarkToggle}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </TabsContent>
         </Tabs>
