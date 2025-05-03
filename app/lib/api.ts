@@ -46,6 +46,7 @@ export interface StoriesApi {
   likeStory: (storyId: string) => Promise<ApiResponse<any>>;
   unlikeStory: (storyId: string) => Promise<ApiResponse<any>>;
   getRecommendedStories: () => Promise<ApiResponse<any>>;
+  updateStory: (id: string, data: Partial<StoryData>) => Promise<ApiResponse<any>>;
 }
 
 // Stories-related API functions
@@ -108,4 +109,11 @@ export const storiesApi: StoriesApi = {
       method: "POST",
     });
   },
-}; 
+
+  updateStory: async (id: string, data: Partial<StoryData>) => {
+    return fetchApi("/story/updateStory", {
+      method: "POST",
+      body: JSON.stringify({ data: { id, ...data } }),
+    });
+  },
+};

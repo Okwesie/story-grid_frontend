@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import type { Story } from "@/types/story"
 import StoryGrid from "./story-grid"
-import { getRecentStories, likeStory, unlikeStory, addComment } from "@/services/story-service"
+import { getDashboardStories, likeStory, unlikeStory, addComment } from "@/services/story-service"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 
@@ -15,8 +15,8 @@ export default function RecentStoriesClient() {
   useEffect(() => {
     async function loadStories() {
       try {
-        const data = await getRecentStories()
-        setStories(data)
+        const { recentPublished } = await getDashboardStories()
+        setStories(recentPublished)
       } catch (error) {
         console.error("Failed to load recent stories:", error)
         toast({
@@ -55,8 +55,8 @@ export default function RecentStoriesClient() {
         variant: "destructive",
       })
       // Revert optimistic update on error
-      const originalStories = await getRecentStories()
-      setStories(originalStories)
+      const originalStories = await getDashboardStories()
+      setStories(originalStories.recentPublished)
     }
   }
 

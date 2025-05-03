@@ -7,7 +7,19 @@ export async function getDrafts(): Promise<Story[]> {
   if (!response.success || !response.data) {
     throw new Error("Failed to fetch drafts")
   }
-  return response.data
+  // If response.data is { stories: [...] }
+  if (Array.isArray(response.data.stories)) {
+    return response.data.stories
+  }
+  // If response.data is { recentDrafts: [...] }
+  if (Array.isArray(response.data.recentDrafts)) {
+    return response.data.recentDrafts
+  }
+  // If response.data is just an array
+  if (Array.isArray(response.data)) {
+    return response.data
+  }
+  return []
 }
 
 export async function getRecentStories(): Promise<Story[]> {
@@ -91,17 +103,26 @@ export async function getStoryById(storyId: string): Promise<Story> {
   return response.data
 }
 
-/** export async function publishDraft(storyId: string): Promise<Story> {
+export async function publishDraft(storyId: string): Promise<Story> {
   const response = await storiesApi.updateStory(storyId, { status: "published" })
   if (!response.success || !response.data) {
     throw new Error("Failed to publish draft")
   }
   return response.data
 }
-*/
+
 export async function deleteDraft(storyId: string): Promise<void> {
   const response = await storiesApi.deleteStory(storyId)
   if (!response.success) {
     throw new Error("Failed to delete draft")
+  }
+}
+
+export async function getDashboardStories(): Promise<{ recentPublished: Story[]; recentDrafts: Story[] }> {
+  const response = await storiesApi.getAllStories({ status: "all", limit: 10 })
+  const data = response.data || {}
+  return {
+    recentPublished: Array.isArray(data.recentPublished) ? data.recentPublished : [],
+    recentDrafts: Array.isArray(data.recentDrafts) ? data.recentDrafts : [],
   }
 }

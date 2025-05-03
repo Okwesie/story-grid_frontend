@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import type { Story } from "@/types/story"
-import { getDrafts, deleteDraft } from "@/services/story-service"
+import { getDashboardStories, deleteDraft, publishDraft } from "@/services/story-service"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Plus } from "lucide-react"
+import { Loader2, Plus, FileText, ChevronRight } from "lucide-react"
 import Link from "next/link"
 
 export default function DraftsClient() {
@@ -17,9 +17,10 @@ export default function DraftsClient() {
 
   useEffect(() => {
     async function loadDrafts() {
+      setLoading(true)
       try {
-        const data = await getDrafts()
-        setDrafts(data)
+        const { recentDrafts } = await getDashboardStories()
+        setDrafts(recentDrafts)
       } catch (error) {
         console.error("Failed to load drafts:", error)
         toast({
@@ -31,7 +32,6 @@ export default function DraftsClient() {
         setLoading(false)
       }
     }
-
     loadDrafts()
   }, [toast])
 
@@ -39,7 +39,7 @@ export default function DraftsClient() {
     setPublishingId(storyId)
     try {
       await publishDraft(storyId)
-      setDrafts(drafts.filter((draft) => draft.id !== storyId))
+      setDrafts((prev) => prev.filter((draft) => draft.id !== storyId))
       toast({
         title: "Success",
         description: "Your story has been published!",
@@ -56,11 +56,11 @@ export default function DraftsClient() {
     }
   }
 
- const handleDelete = async (storyId: string) => {
+  const handleDelete = async (storyId: string) => {
     setDeletingId(storyId)
     try {
       await deleteDraft(storyId)
-      setDrafts(drafts.filter((draft) => draft.id !== storyId))
+      setDrafts((prev) => prev.filter((draft) => draft.id !== storyId))
       toast({
         title: "Success",
         description: "Draft has been deleted.",
@@ -99,6 +99,7 @@ export default function DraftsClient() {
 
       {drafts.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 bg-muted/50 rounded-lg">
+          <FileText className="h-10 w-10 mb-2 text-muted-foreground opacity-50" />
           <p className="text-gray-500 mb-4">You don't have any drafts yet.</p>
           <Link href="/create_story">
             <Button>
@@ -108,47 +109,37 @@ export default function DraftsClient() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="space-y-2">
           {drafts.map((draft) => (
-            <div key={draft.id} className="bg-card rounded-lg overflow-hidden border border-border">
-              <div className="aspect-video relative overflow-hidden">
-                {draft.coverImage ? (
-                  <img
-                    src={draft.coverImage.url || "/placeholder.svg"}
-                    alt={draft.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <span className="text-muted-foreground">No cover image</span>
-                  </div>
-                )}
+            <div
+              key={draft.id}
+              className="flex items-center gap-3 p-3 rounded-md bg-[#1d3557] hover:bg-[#1d3557]/80 transition-colors cursor-pointer"
+            >
+              <div className="h-8 w-8 rounded-md bg-[#0a192f] flex items-center justify-center">
+                <FileText className="h-5 w-5 text-[#f3d34a]" />
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold truncate">{draft.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{draft.description || "No description"}</p>
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleDelete(draft.id)}
-                    disabled={deletingId === draft.id || publishingId === draft.id}
-                  >
-                    {deletingId === draft.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Delete
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handlePublish(draft.id)}
-                    disabled={deletingId === draft.id || publishingId === draft.id}
-                  >
-                    {publishingId === draft.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Publish
-                  </Button>
-                </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-white truncate">{draft.title || "Untitled Draft"}</h4>
+                <p className="text-xs text-[#8892b0]">Last edited {draft.updatedAt ? new Date(draft.updatedAt).toLocaleString() : "recently"}</p>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleDelete(draft.id)}
+                disabled={deletingId === draft.id || publishingId === draft.id}
+              >
+                {deletingId === draft.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Delete
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handlePublish(draft.id)}
+                disabled={deletingId === draft.id || publishingId === draft.id}
+              >
+                {publishingId === draft.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Publish
+              </Button>
+              <ChevronRight className="h-4 w-4 text-[#8892b0]" />
             </div>
           ))}
         </div>

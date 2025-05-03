@@ -230,12 +230,6 @@ export default function Dashboard() {
             >
               Analytics
             </TabsTrigger>
-            <TabsTrigger
-              value="notifications"
-              className={activeTab === "notifications" ? "bg-[#0a192f] text-[#f3d34a]" : "text-[#8892b0]"}
-            >
-              Notifications
-            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
