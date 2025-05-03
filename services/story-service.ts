@@ -12,10 +12,19 @@ export async function getDrafts(): Promise<Story[]> {
 
 export async function getRecentStories(): Promise<Story[]> {
   const response = await storiesApi.getAllStories({ status: "published", limit: 10 })
-  if (!response.success || !response.data) {
-    throw new Error("Failed to fetch recent stories")
+  // If response.data is { stories: [...] }
+  if (response.data && Array.isArray(response.data.stories)) {
+    return response.data.stories
   }
-  return response.data
+  // If response.data is { recentPublished: [...] }
+  if (response.data && Array.isArray(response.data.recentPublished)) {
+    return response.data.recentPublished
+  }
+  // If response.data is just an array
+  if (Array.isArray(response.data)) {
+    return response.data
+  }
+  return []
 }
 
 export async function getFeedStories() {
