@@ -779,7 +779,6 @@ export default function CreateStoryPage() {
               >
                 <span className="font-bold">3</span>
               </div>
-              <span className="mt-2 text-sm">Settings</span>
             </div>
           </div>
         </div>
@@ -975,9 +974,9 @@ export default function CreateStoryPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-white">Add Content</h3>
                 <div className="flex flex-wrap gap-3">
-                  <Button
+                <Button
                     variant="outline"
-                    className="border-[#2d4a7a] text-white hover:bg-[#1d3557] hover:text-[#f3d34a]"
+                    className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90 border-[#f3d34a]"
                     onClick={() => handleAddBlock(BLOCK_TYPES.TEXT)}
                   >
                     <Type className="h-4 w-4 mr-2" />
@@ -985,7 +984,7 @@ export default function CreateStoryPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-[#2d4a7a] text-white hover:bg-[#1d3557] hover:text-[#f3d34a]"
+                    className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90 border-[#f3d34a]"
                     onClick={() => handleAddBlock(BLOCK_TYPES.IMAGE)}
                   >
                     <ImageIcon className="h-4 w-4 mr-2" />
@@ -993,7 +992,7 @@ export default function CreateStoryPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-[#2d4a7a] text-white hover:bg-[#1d3557] hover:text-[#f3d34a]"
+                    className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90 border-[#f3d34a]"
                     onClick={() => handleAddBlock(BLOCK_TYPES.AUDIO)}
                   >
                     <Music className="h-4 w-4 mr-2" />
@@ -1001,7 +1000,7 @@ export default function CreateStoryPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-[#2d4a7a] text-white hover:bg-[#1d3557] hover:text-[#f3d34a]"
+                    className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90 border-[#f3d34a]"
                     onClick={() => handleAddBlock(BLOCK_TYPES.VIDEO)}
                   >
                     <Video className="h-4 w-4 mr-2" />
@@ -1009,7 +1008,7 @@ export default function CreateStoryPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-[#2d4a7a] text-white hover:bg-[#1d3557] hover:text-[#f3d34a]"
+                    className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90 border-[#f3d34a]"
                     onClick={() => handleAddBlock(BLOCK_TYPES.EMBED)}
                   >
                     <FileText className="h-4 w-4 mr-2" />
@@ -1019,20 +1018,14 @@ export default function CreateStoryPage() {
               </div>
 
               <div className="flex justify-between">
-                <Button
+              <Button
                   variant="outline"
-                  className="border-[#2d4a7a] text-white hover:bg-[#1d3557]"
+                  className="bg-[#0a192f] text-[#f3d34a]  border-[#0a192f]"
                   onClick={() => setActiveStep(1)}
                 >
                   Back to Details
                 </Button>
-                <Button
-                  className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]"
-                  onClick={() => setActiveStep(3)}
-                  disabled={storyBlocks.length === 0}
-                >
-                  Continue to Settings
-                </Button>
+                
               </div>
             </div>
           )}
