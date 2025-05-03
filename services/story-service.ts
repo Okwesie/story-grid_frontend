@@ -1,5 +1,6 @@
 import type { Story, Comment } from "@/types/story"
 import { storiesApi, commentsApi } from "@/lib/api"
+import { api } from "@/lib/api"
 
 export async function getDrafts(): Promise<Story[]> {
   const response = await storiesApi.getAllStories({ status: "draft" })
@@ -17,24 +18,37 @@ export async function getRecentStories(): Promise<Story[]> {
   return response.data
 }
 
-export async function getFeedStories(): Promise<{
-  friendStories: Story[]
-  trendingStories: Story[]
-  discoverStories: Story[]
-}> {
-  const [friendsResponse, discoverResponse] = await Promise.all([
-    storiesApi.getAllStories({ status: "published", limit: 5 }),
-    storiesApi.getRecommendedStories()
-  ])
+export async function getFeedStories() {
+  // Friends feed
+  const feedRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/feed/getFeed`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(typeof window !== "undefined" && localStorage.getItem("token")
+        ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        : {}),
+    },
+    body: JSON.stringify({ data: { page: 1, limit: 10 } }),
+  })
+  const feedJson = await feedRes.json()
 
-  if (!friendsResponse.success || !friendsResponse.data || !discoverResponse.success || !discoverResponse.data) {
-    throw new Error("Failed to fetch feed")
-  }
+  // Discover feed
+  const discoverRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/feed/getDiscover`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(typeof window !== "undefined" && localStorage.getItem("token")
+        ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        : {}),
+    },
+    body: JSON.stringify({ data: { page: 1, limit: 10 } }),
+  })
+  const discoverJson = await discoverRes.json()
 
   return {
-    friendStories: friendsResponse.data,
-    trendingStories: [], // TODO: Implement trending stories when API is available
-    discoverStories: discoverResponse.data
+    friendStories: Array.isArray(feedJson.data?.stories) ? feedJson.data.stories : [],
+    trendingStories: [], // Add if you have a trending endpoint
+    discoverStories: Array.isArray(discoverJson.data?.stories) ? discoverJson.data.stories : [],
   }
 }
 

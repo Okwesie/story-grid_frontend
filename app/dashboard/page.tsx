@@ -164,7 +164,7 @@ export default function Dashboard() {
                 Home
               </Button>
             </Link>
-            <Link href="/feed_page">
+            <Link href="/feed">
               <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
                 Explore
               </Button>

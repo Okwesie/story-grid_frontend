@@ -13,7 +13,7 @@ interface StoryGridProps {
   onComment?: (storyId: string, comment: string) => Promise<void>
 }
 
-export default function StoryGrid({ stories, emptyMessage, onLike, onComment }: StoryGridProps) {
+export default function StoryGrid({ stories = [], emptyMessage, onLike, onComment }: StoryGridProps) {
   const [expandedStory, setExpandedStory] = useState<Story | null>(null)
 
   if (stories.length === 0) {
@@ -27,7 +27,7 @@ export default function StoryGrid({ stories, emptyMessage, onLike, onComment }: 
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {stories.map((story) => (
+        {(Array.isArray(stories) ? stories : []).map((story) => (
           <motion.div
             key={story.id}
             layout
