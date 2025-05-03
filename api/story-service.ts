@@ -8,7 +8,7 @@ import type { StoryData, Story, ApiResponse, ApiError } from "@/lib/api"
  */
 export const createStory = async (storyData: StoryData, token: string): Promise<ApiResponse<Story>> => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/story/create`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/story/createStory`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
