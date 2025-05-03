@@ -164,12 +164,12 @@ export default function Dashboard() {
                 Home
               </Button>
             </Link>
-            <Link href="/feed-page">
+            <Link href="/feed_page">
               <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
                 Explore
               </Button>
             </Link>
-            <Link href="/friend-requests">
+            <Link href="/friend_requests">
               <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
@@ -180,13 +180,10 @@ export default function Dashboard() {
                 Messages
               </Button>
             </Link>
-            <Link href="/profile-page">
-              <Avatar className="h-8 w-8 cursor-pointer">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt={user?.username || "User"} />
-                <AvatarFallback className="bg-[#1d3557] text-[#f3d34a]">
-                  {user?.username ? user.username[0].toUpperCase() : "U"}
-                </AvatarFallback>
-              </Avatar>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
             </Link>
           </nav>
         </div>
@@ -204,12 +201,6 @@ export default function Dashboard() {
               <Button className="bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Story
-              </Button>
-            </Link>
-            <Link href="/settings">
-              <Button variant="outline" className="border-[#1d3557] text-white hover:bg-[#1d3557]">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
               </Button>
             </Link>
           </div>

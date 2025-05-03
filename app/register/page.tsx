@@ -13,6 +13,8 @@ export default function Register() {
   const router = useRouter()
   const { register } = useAuth()
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
     username: "",
     password: "",
@@ -33,6 +35,8 @@ export default function Register() {
     try {
       // Format the data according to your backend's expected structure
       const userData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         username: formData.username,
         password: formData.password,
@@ -64,6 +68,36 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName" className="text-white">
+              First Name
+            </Label>
+            <Input
+              id="firstName"
+              name="firstName"
+              type="text"
+              required
+              value={formData.firstName}
+              onChange={handleChange}
+              className="bg-white/10 border-white/20 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="lastName" className="text-white">
+              Last Name
+            </Label>
+            <Input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              value={formData.lastName}
+              onChange={handleChange}
+              className="bg-white/10 border-white/20 text-white"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white">
               Email

@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   Mail,
@@ -24,6 +25,8 @@ import {
   Sparkles,
   BadgeCheck,
   ArrowLeft,
+  Search,
+  Bell,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -281,32 +284,52 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#0a192f] text-white">
       {/* Navigation Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-[#0a192f]/80 backdrop-blur-sm border-b border-[#1d3557]">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            className="text-[#8892b0] hover:text-[#f3d34a] hover:bg-[#f3d34a]/10"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="text-[#8892b0] hover:text-[#f3d34a] hover:bg-[#f3d34a]/10"
-              onClick={() => router.push("/dashboard")}
-            >
-              Dashboard
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-[#8892b0] hover:text-[#f3d34a] hover:bg-[#f3d34a]/10"
-              onClick={() => router.push("/stories")}
-            >
-              Stories
-            </Button>
+           {/* Header */}
+      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/dashboard">
+            <h1 className="text-[#f3d34a] text-2xl font-bold">StoryGrid</h1>
+          </Link>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex relative max-w-md w-full mx-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
+            <Input
+              placeholder="Search stories, creators, tags..."
+              className="pl-10 bg-[#112240] border-[#1d3557] text-white focus-visible:ring-[#f3d34a] w-full"
+            />
           </div>
+
+          <nav className="flex items-center space-x-2 md:space-x-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#f3d34a]">
+                Home
+              </Button>
+            </Link>
+            <Link href="/feed_page">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Explore
+              </Button>
+            </Link>
+            <Link href="/friend_requests">
+              <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+              </Button>
+            </Link>
+            <Link href="/messages">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Messages
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
+            </Link>
+          </nav>
         </div>
+      </header>
       </div>
 
       {/* Success animation */}
