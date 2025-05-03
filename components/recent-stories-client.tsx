@@ -38,13 +38,13 @@ export default function RecentStoriesClient() {
       const story = stories.find((s) => s.id === storyId)
       if (!story) return
 
-      if (story.isLiked) {
+      if (story.userLiked) {
         // Optimistically update UI
-        setStories(stories.map((s) => (s.id === storyId ? { ...s, isLiked: false, likesCount: s.likesCount - 1 } : s)))
+        setStories(stories.map((s) => (s.id === storyId ? { ...s, userLiked: false, likeCount: (s.likeCount || 0) - 1 } : s)))
         await unlikeStory(storyId)
       } else {
         // Optimistically update UI
-        setStories(stories.map((s) => (s.id === storyId ? { ...s, isLiked: true, likesCount: s.likesCount + 1 } : s)))
+        setStories(stories.map((s) => (s.id === storyId ? { ...s, userLiked: true, likeCount: (s.likeCount || 0) + 1 } : s)))
         await likeStory(storyId)
       }
     } catch (error) {
@@ -71,7 +71,7 @@ export default function RecentStoriesClient() {
             return {
               ...story,
               comments: [...story.comments, newComment],
-              commentsCount: story.commentsCount + 1,
+              commentCount: (story.commentCount || 0) + 1,
             }
           }
           return story

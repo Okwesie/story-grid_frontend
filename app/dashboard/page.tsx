@@ -310,7 +310,7 @@ export default function Dashboard() {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle>Recent Stories</CardTitle>
-                    <Link href="/profile-page" className="text-[#f3d34a] text-sm hover:underline">
+                    <Link href="/recent" className="text-[#f3d34a] text-sm hover:underline">
                       View All
                     </Link>
                   </div>
@@ -322,7 +322,7 @@ export default function Dashboard() {
                       <div className="text-center py-8">
                         <ImageIcon className="h-12 w-12 mx-auto text-[#8892b0] mb-3 opacity-50" />
                         <p className="text-[#8892b0]">You haven't published any stories yet.</p>
-                        <Link href="/create-story">
+                        <Link href="/create_story">
                           <Button className="mt-4 bg-[#f3d34a] text-[#0a192f] hover:bg-[#f3d34a]/90">
                             Create Your First Story
                           </Button>
@@ -402,7 +402,7 @@ export default function Dashboard() {
                         </div>
                       ))
                     )}
-                    <Link href="/create-story">
+                    <Link href="/create_story">
                       <Button
                         variant="outline"
                         className="w-full border-dashed border-[#1d3557] text-[#8892b0] hover:bg-[#1d3557] hover:text-white"
@@ -897,70 +897,6 @@ export default function Dashboard() {
               <CardFooter>
                 <Link href="/analytics/detailed" className="text-[#f3d34a] text-sm hover:underline w-full text-center">
                   View Full Analytics Report
-                </Link>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-6">
-            <Card className="bg-[#112240] border-[#1d3557] text-white">
-              <CardHeader>
-                <CardTitle>Recent Notifications</CardTitle>
-                <CardDescription className="text-[#8892b0]">Stay updated with your activity</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Sample notifications - would be replaced with real data */}
-                  <div className="p-4 rounded-lg bg-[#1d3557] flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                      <AvatarFallback className="bg-[#0a192f] text-[#f3d34a]">AR</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-white">
-                        <span className="font-medium">Alex Rivera</span> liked your story 'The Silent Forest'
-                      </p>
-                      <p className="text-xs text-[#8892b0] mt-1">2 hours ago</p>
-                    </div>
-                    <div className="h-2 w-2 rounded-full bg-[#f3d34a] mt-2"></div>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-[#1d3557]/50 flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                      <AvatarFallback className="bg-[#0a192f] text-[#f3d34a]">MC</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-white">
-                        <span className="font-medium">Maria Chen</span> commented on your story 'Urban Soundscapes'
-                      </p>
-                      <p className="text-xs text-[#8892b0] mt-1">1 day ago</p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-[#1d3557]/50 flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                      <AvatarFallback className="bg-[#0a192f] text-[#f3d34a]">JW</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-white">
-                        <span className="font-medium">James Wilson</span> started following you
-                      </p>
-                      <p className="text-xs text-[#8892b0] mt-1">3 days ago</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" className="border-[#1d3557] text-[#8892b0] hover:text-white">
-                  Mark All as Read
-                </Button>
-                <Link href="/notifications">
-                  <Button variant="ghost" className="text-[#f3d34a] hover:text-[#f3d34a]/80">
-                    View All Notifications
-                  </Button>
                 </Link>
               </CardFooter>
             </Card>

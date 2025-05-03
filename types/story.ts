@@ -6,18 +6,32 @@ export interface Author {
   
   export interface MediaItem {
     id: string
-    type: string
     url: string
-    order: number
+    type: string
     metadata?: {
-      caption?: string
+      publicId?: string
+      format?: string
+      size?: number
       width?: number
       height?: number
     }
   }
   
+  export interface Comment {
+    id: string
+    content: string
+    createdAt: string
+    user: {
+      id: string
+      username: string
+      avatar?: string
+    }
+    replies?: Comment[]
+    timeAgo?: string
+  }
+  
   export type StoryStatus = "draft" | "published" | "archived"
-  export type StoryType = "visual" | "audio" | "video" | "interactive"
+  export type StoryType = "visual" | "audio" | "video" | "interactive" | "mixed"
   
   export interface Story {
     id: string
@@ -34,7 +48,11 @@ export interface Author {
     createdAt: string
     updatedAt: string
     userId?: string
-    author?: Author
+    author?: {
+      id: string
+      username: string
+      avatar?: string
+    }
     thumbnail?: string
     coverImage?: MediaItem
     media?: MediaItem[]
@@ -46,8 +64,9 @@ export interface Author {
     lastEdited?: string
     type?: StoryType
     views?: number
-    comments?: number
+    comments: Comment[]
     engagementScore?: number
+    excerpt?: string
   }
   
   export interface PaginatedResponse<T> {

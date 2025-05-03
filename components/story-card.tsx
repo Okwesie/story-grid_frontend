@@ -11,6 +11,7 @@ import type { Story, StoryType } from "@/types/story"
 interface StoryCardProps {
   story: Story
   onClick?: (story: Story) => void
+  onLike?: (storyId: string) => Promise<void>
   className?: string
   aspectRatio?: "portrait" | "landscape" | "square"
 }
@@ -31,17 +32,19 @@ export const getTypeIcon = (type?: StoryType) => {
   }
 }
 
-export function StoryCard({ story, onClick, className, aspectRatio = "portrait" }: StoryCardProps) {
+export function StoryCard({ story, onClick, onLike, className, aspectRatio = "portrait" }: StoryCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isLiked, setIsLiked] = useState(story.userLiked || false)
   const [likesCount, setLikesCount] = useState(story.likeCount || 0)
 
-  const handleLikeToggle = (e: React.MouseEvent) => {
+  const handleLikeToggle = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setIsLiked(!isLiked)
     setLikesCount(isLiked ? likesCount - 1 : likesCount + 1)
-    // In a real implementation, you would call the API here
+    if (onLike) {
+      await onLike(story.id)
+    }
   }
 
   const handleCardClick = () => {
@@ -130,7 +133,7 @@ export function StoryCard({ story, onClick, className, aspectRatio = "portrait" 
             </button>
             <button className="text-[#8892b0] hover:text-[#f3d34a] transition-colors flex items-center gap-1">
               <MessageSquare className="h-4 w-4" />
-              <span className="text-xs">{story.commentCount || story.comments || 0}</span>
+              <span className="text-xs">{story.commentCount || 0}</span>
             </button>
             {story.viewCount !== undefined && (
               <button className="text-[#8892b0] transition-colors flex items-center gap-1">

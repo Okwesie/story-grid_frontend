@@ -56,12 +56,12 @@ export default function CommentSection({ comments, onAddComment }: CommentSectio
           comments.map((comment) => (
             <div key={comment.id} className="flex gap-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={comment.author.profileImage || "/placeholder.svg"} alt={comment.author.name} />
-                <AvatarFallback>{comment.author.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={comment.user.avatar || "/placeholder.svg"} alt={comment.user.username} />
+                <AvatarFallback>{comment.user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">{comment.author.name}</span>
+                  <span className="font-medium">{comment.user.username}</span>
                   <span className="text-xs text-gray-500">
                     {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                   </span>

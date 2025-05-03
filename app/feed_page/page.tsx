@@ -142,7 +142,16 @@ export default function ExplorePage() {
       return {
         success: true,
         data: {
-          stories,
+          stories: stories.map(story => ({
+            ...story,
+            content: story.content || "",
+            likes: typeof story.likes === 'number' ? story.likes : 0,
+            comments: Array.isArray(story.comments) ? story.comments : [],
+            likeCount: story.likeCount || 0,
+            commentCount: story.commentCount || 0,
+            userLiked: story.userLiked || false,
+            type: story.type || "visual"
+          })),
           pagination: {
             total: stories.length,
             page: 1,

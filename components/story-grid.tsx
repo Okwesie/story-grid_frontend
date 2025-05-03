@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import type { Story } from "@/types/story"
-import StoryCard from "./story-card"
-import StoryExpanded from "./story-expanded"
+import { StoryCard } from "./story-card"
+import { StoryExpanded } from "./story-expanded"
 import { AnimatePresence, motion } from "framer-motion"
 
 interface StoryGridProps {
@@ -52,7 +52,7 @@ export default function StoryGrid({ stories, emptyMessage, onLike, onComment }: 
             story={expandedStory}
             onClose={() => setExpandedStory(null)}
             onLike={onLike ? () => onLike(expandedStory.id) : undefined}
-            onComment={onComment ? (comment) => onComment(expandedStory.id, comment) : undefined}
+            onComment={onComment ? (comment: string) => onComment(expandedStory.id, comment) : undefined}
           />
         )}
       </AnimatePresence>

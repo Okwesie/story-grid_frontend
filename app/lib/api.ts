@@ -36,7 +36,7 @@ export interface StoryData {
   isDraft?: boolean;
 }
 
-interface StoriesApi {
+export interface StoriesApi {
   uploadMedia: (formData: FormData) => Promise<ApiResponse<MediaData>>;
   createStory: (storyData: StoryData) => Promise<ApiResponse<any>>;
   getAllStories: (params?: { status?: string; limit?: number; page?: number }) => Promise<ApiResponse<any>>;

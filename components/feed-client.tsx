@@ -58,11 +58,11 @@ export default function FeedClient() {
       if (!story || !storySection) return
 
       // Optimistically update UI
-      if (story.isLiked) {
+      if (story.userLiked) {
         setFeedData({
           ...feedData,
           [storySection]: feedData[storySection].map((s) =>
-            s.id === storyId ? { ...s, isLiked: false, likesCount: s.likesCount - 1 } : s,
+            s.id === storyId ? { ...s, userLiked: false, likeCount: (s.likeCount || 0) - 1 } : s,
           ),
         })
         await unlikeStory(storyId)
@@ -70,7 +70,7 @@ export default function FeedClient() {
         setFeedData({
           ...feedData,
           [storySection]: feedData[storySection].map((s) =>
-            s.id === storyId ? { ...s, isLiked: true, likesCount: s.likesCount + 1 } : s,
+            s.id === storyId ? { ...s, userLiked: true, likeCount: (s.likeCount || 0) + 1 } : s,
           ),
         })
         await likeStory(storyId)
@@ -99,13 +99,16 @@ export default function FeedClient() {
         const storyIndex = updatedFeedData[section].findIndex((s) => s.id === storyId)
 
         if (storyIndex !== -1) {
-          updatedFeedData[section] = [...updatedFeedData[section]]
-          updatedFeedData[section][storyIndex] = {
-            ...updatedFeedData[section][storyIndex],
-            comments: [...updatedFeedData[section][storyIndex].comments, newComment],
-            commentsCount: updatedFeedData[section][storyIndex].commentsCount + 1,
+          const story = updatedFeedData[section][storyIndex]
+          if (story) {
+            updatedFeedData[section] = [...updatedFeedData[section]]
+            updatedFeedData[section][storyIndex] = {
+              ...story,
+              comments: [...story.comments, newComment],
+              commentCount: (story.commentCount || 0) + 1,
+            }
+            break
           }
-          break
         }
       }
 

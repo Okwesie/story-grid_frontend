@@ -60,17 +60,36 @@ export interface Story {
   id: string
   title: string
   content: string
+  description?: string
+  status: "draft" | "published" | "archived"
+  category?: string
+  tags?: string[]
+  viewCount?: number
+  readTime?: number
+  isFeatured?: boolean
+  publishedAt?: string
+  createdAt: string
+  updatedAt: string
+  userId: string
   author: {
     id: string
     username: string
-    email: string
     avatar?: string
   }
-  media: MediaData[]
+  thumbnail?: string
+  coverImage?: MediaData
+  media?: MediaData[]
+  likes: number
   likeCount: number
   commentCount: number
   userLiked: boolean
-  timeAgo: string
+  timeAgo?: string
+  lastEdited?: string
+  type: "visual" | "audio" | "video" | "interactive" | "mixed"
+  views?: number
+  comments: Comment[]
+  engagementScore?: number
+  excerpt?: string
 }
 
 // API Response types

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Story } from "@/types/story"
-import { getDrafts, publishDraft, deleteDraft } from "@/services/story-service"
+import { getDrafts, deleteDraft } from "@/services/story-service"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Plus } from "lucide-react"
@@ -56,7 +56,7 @@ export default function DraftsClient() {
     }
   }
 
-  const handleDelete = async (storyId: string) => {
+ const handleDelete = async (storyId: string) => {
     setDeletingId(storyId)
     try {
       await deleteDraft(storyId)
@@ -114,7 +114,7 @@ export default function DraftsClient() {
               <div className="aspect-video relative overflow-hidden">
                 {draft.coverImage ? (
                   <img
-                    src={draft.coverImage || "/placeholder.svg"}
+                    src={draft.coverImage.url || "/placeholder.svg"}
                     alt={draft.title}
                     className="w-full h-full object-cover"
                   />
@@ -126,7 +126,7 @@ export default function DraftsClient() {
               </div>
               <div className="p-4">
                 <h3 className="font-semibold truncate">{draft.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{draft.excerpt || "No description"}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{draft.description || "No description"}</p>
                 <div className="flex gap-2 mt-4">
                   <Button
                     variant="outline"

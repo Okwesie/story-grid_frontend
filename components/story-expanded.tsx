@@ -12,6 +12,8 @@ import { getTypeIcon } from "@/components/story-card"
 interface StoryExpandedProps {
   story: Story
   onClose: () => void
+  onLike?: (storyId: string) => Promise<void>
+  onComment?: (storyId: string, comment: string) => Promise<void>
 }
 
 interface Comment {
@@ -26,7 +28,7 @@ interface Comment {
   timeAgo?: string
 }
 
-export function StoryExpanded({ story, onClose }: StoryExpandedProps) {
+export function StoryExpanded({ story, onClose, onLike, onComment }: StoryExpandedProps) {
   const [isLiked, setIsLiked] = useState(story.userLiked || false)
   const [likesCount, setLikesCount] = useState(story.likeCount || 0)
   const [comments, setComments] = useState<Comment[]>([])
@@ -62,6 +64,9 @@ export function StoryExpanded({ story, onClose }: StoryExpandedProps) {
         setLikesCount(likesCount + 1)
       }
       setIsLiked(!isLiked)
+      if (onLike) {
+        await onLike(story.id)
+      }
     } catch (error) {
       console.error("Failed to like/unlike story:", error)
     }
@@ -81,6 +86,9 @@ export function StoryExpanded({ story, onClose }: StoryExpandedProps) {
       }
 
       setNewComment("")
+      if (onComment) {
+        await onComment(story.id, newComment)
+      }
     } catch (error) {
       console.error("Failed to add comment:", error)
     } finally {
