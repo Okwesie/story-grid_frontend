@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/lib/api"
+import { safeLocalStorage } from "@/lib/utils"
 
 // Define the AuthContext type
 type AuthContextType = {
@@ -59,7 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null)
 
       try {
-        const token = localStorage.getItem("token")
+        // Check if token exists in localStorage
+        const token = safeLocalStorage.getItem("token")
 
         if (!token) {
           setUser(null)
@@ -77,10 +79,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null)
         setError("Authentication error. Please try again.")
         console.error("Auth check error:", err)
-        // Clear invalid token
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("token")
-        }
+        // Clear token from localStorage
+        safeLocalStorage.removeItem("token")
       } finally {
         setIsLoading(false)
       }
@@ -122,7 +122,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Logout error:", error)
       // Even if the API call fails, clear the local state
       setUser(null)
-      localStorage.removeItem("token")
+      // Clear token and user data
+      safeLocalStorage.removeItem("token")
     } finally {
       setIsLoading(false)
     }

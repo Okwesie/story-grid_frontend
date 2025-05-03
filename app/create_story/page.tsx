@@ -36,7 +36,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
-import { cn } from "@/lib/utils"
+import { cn, safeLocalStorage } from "@/lib/utils"
 import { storiesApi, StoryData as ApiStoryData, StoryBlock as ApiStoryBlock, MediaData, ApiResponse } from "@/lib/api"
 
 // Media block types
@@ -190,60 +190,104 @@ export default function CreateStoryPage() {
   const handleSaveAsDraft = async () => {
     setIsSaving(true)
     try {
-      const storyData: ApiStoryData = {
+      // Create a content string from blocks for the backend
+      const content = storyBlocks
+        .map(block => {
+          if (block.type === BLOCK_TYPES.TEXT) {
+            return block.content;
+          }
+          return '';
+        })
+        .filter(Boolean)
+        .join('\n\n');
+
+      // Prepare media array for backend
+      const media: any[] = [];
+      
+      // Create the story data object that matches backend requirements
+      const backendStoryData: any = {
         title: storyTitle,
-        description: storyDescription,
+        content: content || storyDescription,
+        category: "story",
         tags: tags,
-        isDraft: true,
-        blocks: storyBlocks.map(block => ({
-          type: block.type,
-          content: block.content,
-          caption: block.caption
-        }))
+        media: media
       };
 
       // First, upload all media files
-      const mediaUploads: Promise<ApiResponse<MediaData>>[] = [];
       if (coverImage) {
+        const token = safeLocalStorage.getItem('token');
         const coverImageFormData = new FormData();
         coverImageFormData.append('file', coverImage);
-        const uploadResult = await storiesApi.uploadMedia(coverImageFormData);
+        // Handle media upload with appropriate API
+        const uploadResponse = await fetch('/api/media/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: coverImageFormData
+        });
+        const uploadResult = await uploadResponse.json();
+        
         if (uploadResult.success && uploadResult.data) {
-          storyData.coverImage = uploadResult.data;
+          // Add to media array for backend
+          media.push({
+            type: 'image',
+            url: uploadResult.data.url,
+            metadata: uploadResult.data.metadata
+          });
         }
       }
 
-      // Upload block files and update blocks with media IDs
-      const updatedBlocks = await Promise.all(
+      // Upload block files 
+      await Promise.all(
         storyBlocks.map(async (block) => {
           if (block.file) {
+            const token = safeLocalStorage.getItem('token');
             const blockFormData = new FormData();
             blockFormData.append('file', block.file);
-            const uploadResult = await storiesApi.uploadMedia(blockFormData);
+            // Handle media upload with appropriate API
+            const uploadResponse = await fetch('/api/media/upload', {
+              method: 'POST',
+              headers: {
+                'Authorization': token ? `Bearer ${token}` : ''
+              },
+              body: blockFormData
+            });
+            const uploadResult = await uploadResponse.json();
+            
             if (uploadResult.success && uploadResult.data) {
-              return {
-                type: block.type,
-                content: block.content,
-                caption: block.caption,
-                mediaId: uploadResult.data.id
-              };
+              // Add to media array for backend
+              media.push({
+                type: block.type.toLowerCase(),
+                url: uploadResult.data.url,
+                metadata: uploadResult.data.metadata
+              });
             }
           }
-          return {
-            type: block.type,
-            content: block.content,
-            caption: block.caption
-          };
         })
       );
 
-      storyData.blocks = updatedBlocks;
-
       // Create the story
-      await storiesApi.createStory(storyData);
-      setIsSaving(false);
-      alert("Story saved as draft!");
+      const token = safeLocalStorage.getItem('token');
+      const createStoryResponse = await fetch('/api/story/createStory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ data: backendStoryData })
+      });
+      
+      const createResult = await createStoryResponse.json();
+      
+      if (createResult.success) {
+        setIsSaving(false);
+        alert("Story saved as draft!");
+      } else {
+        throw new Error(createResult.message || 'Failed to save story');
+      }
     } catch (error) {
+      console.error("Save draft error:", error);
       setIsSaving(false);
       alert("Failed to save story!");
     }
@@ -253,59 +297,105 @@ export default function CreateStoryPage() {
   const handlePublish = async () => {
     setIsPublishing(true)
     try {
-      const storyData: ApiStoryData = {
+      // Create a content string from blocks for the backend
+      const content = storyBlocks
+        .map(block => {
+          if (block.type === BLOCK_TYPES.TEXT) {
+            return block.content;
+          }
+          return '';
+        })
+        .filter(Boolean)
+        .join('\n\n');
+
+      // Prepare media array for backend
+      const media: any[] = [];
+      
+      // Create the story data object that matches backend requirements
+      const backendStoryData: any = {
         title: storyTitle,
-        description: storyDescription,
+        content: content || storyDescription,
+        category: "story", 
         tags: tags,
-        isDraft: false,
-        blocks: storyBlocks.map(block => ({
-          type: block.type,
-          content: block.content,
-          caption: block.caption
-        }))
+        media: media,
+        status: 'published'
       };
 
       // First, upload all media files
       if (coverImage) {
+        const token = safeLocalStorage.getItem('token');
         const coverImageFormData = new FormData();
         coverImageFormData.append('file', coverImage);
-        const uploadResult = await storiesApi.uploadMedia(coverImageFormData);
+        // Handle media upload with appropriate API
+        const uploadResponse = await fetch('/api/media/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: coverImageFormData
+        });
+        const uploadResult = await uploadResponse.json();
+        
         if (uploadResult.success && uploadResult.data) {
-          storyData.coverImage = uploadResult.data;
+          // Add to media array for backend
+          media.push({
+            type: 'image',
+            url: uploadResult.data.url,
+            metadata: uploadResult.data.metadata
+          });
         }
       }
 
-      // Upload block files and update blocks with media IDs
-      const updatedBlocks = await Promise.all(
+      // Upload block files 
+      await Promise.all(
         storyBlocks.map(async (block) => {
           if (block.file) {
+            const token = safeLocalStorage.getItem('token');
             const blockFormData = new FormData();
             blockFormData.append('file', block.file);
-            const uploadResult = await storiesApi.uploadMedia(blockFormData);
+            // Handle media upload with appropriate API
+            const uploadResponse = await fetch('/api/media/upload', {
+              method: 'POST',
+              headers: {
+                'Authorization': token ? `Bearer ${token}` : ''
+              },
+              body: blockFormData
+            });
+            const uploadResult = await uploadResponse.json();
+            
             if (uploadResult.success && uploadResult.data) {
-              return {
-                type: block.type,
-                content: block.content,
-                caption: block.caption,
-                mediaId: uploadResult.data.id
-              };
+              // Add to media array for backend
+              media.push({
+                type: block.type.toLowerCase(),
+                url: uploadResult.data.url,
+                metadata: uploadResult.data.metadata
+              });
             }
           }
-          return {
-            type: block.type,
-            content: block.content,
-            caption: block.caption
-          };
         })
       );
 
-      storyData.blocks = updatedBlocks;
-
       // Create the story
-      await storiesApi.createStory(storyData);
-      setIsPublishing(false);
-      alert("Story published successfully!");
+      const token = safeLocalStorage.getItem('token');
+      const createStoryResponse = await fetch('/api/story/createStory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ data: backendStoryData })
+      });
+      
+      const createResult = await createStoryResponse.json();
+      
+      if (createResult.success) {
+        setIsPublishing(false);
+        alert("Story published successfully!");
+      } else {
+        throw new Error(createResult.message || 'Failed to publish story');
+      }
     } catch (error) {
+      console.error("Publish error:", error);
       setIsPublishing(false);
       alert("Failed to publish story!");
     }
