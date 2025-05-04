@@ -573,6 +573,15 @@ export const storiesApi = {
       method: "POST",
     })
   },
+
+  updateStory: async (storyId: string, updateData: { status: string }) => {
+    // Add implementation for updating a story
+    const response = await fetchApi(`/stories/${storyId}`, {
+      method: "PUT",
+      body: JSON.stringify(updateData),
+    })
+    return response.data
+  }
 }
 
 // Comments-related API functions

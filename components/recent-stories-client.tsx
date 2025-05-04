@@ -5,7 +5,9 @@ import type { Story } from "@/types/story"
 import StoryGrid from "./story-grid"
 import { getDashboardStories, likeStory, unlikeStory, addComment } from "@/services/story-service"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2 } from "lucide-react"
+import { Loader2, ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default function RecentStoriesClient() {
   const [stories, setStories] = useState<Story[]>([])
@@ -102,7 +104,25 @@ export default function RecentStoriesClient() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Recent Stories</h1>
+      {/* Enhanced Header */}
+      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10 mb-6">
+        <Link href="/dashboard">
+                <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a]">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+        <div className="container mx-auto">
+          <div className="flex items-center justify-between">
+            <h1 className="text-[#f3d34a] text-2xl font-bold">Recent Stories</h1>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex mt-4 border-b border-[#1d3557]">
+            <div className="text-[#f3d34a] border-b-2 border-[#f3d34a] px-4 py-2 font-medium">For You</div>
+            
+          </div>
+        </div>
+      </header>
       <StoryGrid
         stories={stories}
         emptyMessage="No recent stories found."

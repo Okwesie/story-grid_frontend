@@ -103,6 +103,7 @@ export async function getStoryById(storyId: string): Promise<Story> {
   return response.data
 }
 
+
 export async function publishDraft(storyId: string): Promise<Story> {
   const response = await storiesApi.updateStory(storyId, { status: "published" })
   if (!response.success || !response.data) {

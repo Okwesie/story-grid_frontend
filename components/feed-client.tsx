@@ -5,7 +5,10 @@ import type { Story } from "@/types/story"
 import StoryGrid from "./story-grid"
 import { getFeedStories, likeStory, unlikeStory, addComment } from "@/services/story-service"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2 } from "lucide-react"
+import Link from "next/link"
+import { Loader2, Search, Bell } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function FeedClient() {
@@ -138,7 +141,52 @@ export default function FeedClient() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Feed</h1>
+      {/* Header */}
+      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/dashboard">
+            <h1 className="text-[#f3d34a] text-2xl font-bold">StoryGrid</h1>
+          </Link>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex relative max-w-md w-full mx-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
+            <Input
+              placeholder="Search stories, creators, tags..."
+              className="pl-10 bg-[#112240] border-[#1d3557] text-white focus-visible:ring-[#f3d34a] w-full"
+            />
+          </div>
+
+          <nav className="flex items-center space-x-2 md:space-x-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#f3d34a]">
+                Home
+              </Button>
+            </Link>
+            <Link href="/feed">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Explore
+              </Button>
+            </Link>
+            <Link href="/friend_requests">
+              <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+              </Button>
+            </Link>
+            <Link href="/messages">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Messages
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
+            </Link>
+          </nav>
+        </div>
+      </header>
 
       <Tabs defaultValue="friends" className="w-full">
         <TabsList className="grid grid-cols-3 mb-6">

@@ -1,13 +1,15 @@
 "use client"
 
+import React from "react"
 import { useState, useEffect, useRef } from "react"
-import { Send, Plus, Search, User, Menu, ChevronLeft, MoreVertical, Paperclip, Smile, Image, Phone, Video, X } from "lucide-react"
+import { Send, Plus, Search, User, Menu, ChevronLeft, MoreVertical, Paperclip, Smile, Image, Phone, Video, X, Bell } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -558,22 +560,49 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen bg-[#0a192f] text-white flex flex-col">
       {/* Header */}
-      <header className="bg-[#112240] border-b border-[#1d3557] p-4 sticky top-0 z-10">
+      <header className="bg-[#0a192f] border-b border-[#1d3557] p-4 sticky top-0 z-10">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-[#8892b0] hover:text-[#f3d34a] mr-2"
-              onClick={() => router.push('/dashboard')}
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold">Messages</h1>
+          <Link href="/dashboard">
+            <h1 className="text-[#f3d34a] text-2xl font-bold">StoryGrid</h1>
+          </Link>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex relative max-w-md w-full mx-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
+            <Input
+              placeholder="Search stories, creators, tags..."
+              className="pl-10 bg-[#112240] border-[#1d3557] text-white focus-visible:ring-[#f3d34a] w-full"
+            />
           </div>
-          <Button variant="ghost" size="icon" className="text-[#8892b0] hover:text-[#f3d34a]">
-            <Menu className="h-5 w-5" />
-          </Button>
+
+          <nav className="flex items-center space-x-2 md:space-x-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#f3d34a]">
+                Home
+              </Button>
+            </Link>
+            <Link href="/feed">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Explore
+              </Button>
+            </Link>
+            <Link href="/friend_requests">
+              <Button variant="ghost" size="icon" className="text-white hover:text-[#f3d34a] relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+              </Button>
+            </Link>
+            <Link href="/messages">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Messages
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
+            </Link>
+          </nav>
         </div>
       </header>
 

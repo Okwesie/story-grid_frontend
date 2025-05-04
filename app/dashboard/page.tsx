@@ -181,12 +181,9 @@ export default function Dashboard() {
               </Button>
             </Link>
             <Link href="/profile">
-              <Avatar className="h-8 w-8 cursor-pointer">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt={user?.username || "User"} />
-                <AvatarFallback className="bg-[#1d3557] text-[#f3d34a]">
-                  {user?.username ? user.username[0].toUpperCase() : "U"}
-                </AvatarFallback>
-              </Avatar>
+              <Button variant="ghost" className="text-white hover:text-[#f3d34a]">
+                Profile
+              </Button>
             </Link>
           </nav>
         </div>
