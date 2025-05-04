@@ -116,4 +116,17 @@ export const storiesApi: StoriesApi = {
       body: JSON.stringify({ data: { id, ...data } }),
     });
   },
+}
+
+export async function updateProfile(updateData: any) {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
+    method: "PUT", // or "POST" if your backend expects that
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(updateData),
+  })
+  return res.json()
 };

@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
+import { updateProfile } from "@/lib/api" // import your helper
 
 interface Skill {
   id: string;
@@ -37,6 +38,16 @@ export default function EditProfilePage() {
   const [profileVisibility, setProfileVisibility] = useState<boolean>(true)
   const [storyVisibility, setStoryVisibility] = useState<boolean>(true)
   const [emailNotifications, setEmailNotifications] = useState<boolean>(true)
+  const [saving, setSaving] = useState(false)
+  const [success, setSuccess] = useState("")
+  const [error, setError] = useState("")
+
+  const [fullName, setFullName] = useState("")
+  const [username, setUsername] = useState("")
+  const [title, setTitle] = useState("")
+  const [bio, setBio] = useState("")
+  const [email, setEmail] = useState("")
+  const [location, setLocation] = useState("")
 
   const handleAddSkill = (skill: string) => {
     if (skill && !skills.some(s => s.name === skill)) {
@@ -55,9 +66,46 @@ export default function EditProfilePage() {
     ))
   }
 
-  const handleSaveChanges = () => {
-    // TODO: Implement save functionality
-    console.log("Saving changes...")
+  const handleSaveChanges = async () => {
+    setSaving(true)
+    setSuccess("")
+    setError("")
+    try {
+      const updateData = {
+        fullName,
+        username,
+        title,
+        bio,
+        email,
+        location,
+        skills: skills.map(s => s.name),
+        socialLinks,
+        profileVisibility,
+        storyVisibility,
+        emailNotifications,
+      }
+
+      // Use POST and the correct endpoint
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/updateProfile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(updateData),
+      }).then(res => res.json())
+
+      if (response.status === 200) {
+        setSuccess("Profile updated successfully!")
+      } else {
+        setError(response.msg || "Failed to update profile")
+      }
+    } catch (err) {
+      setError("An error occurred while updating your profile.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleCancel = () => {
@@ -178,6 +226,8 @@ export default function EditProfilePage() {
                     <CardDescription className="text-[#8892b0]">Update your personal information</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {success && <div className="text-green-400 mb-4">{success}</div>}
+                    {error && <div className="text-red-400 mb-4">{error}</div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-white">
@@ -185,7 +235,8 @@ export default function EditProfilePage() {
                         </Label>
                         <Input
                           id="name"
-                          defaultValue="Jane Doe"
+                          value={fullName}
+                          onChange={e => setFullName(e.target.value)}
                           className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a]"
                         />
                       </div>
@@ -195,7 +246,8 @@ export default function EditProfilePage() {
                         </Label>
                         <Input
                           id="username"
-                          defaultValue="janedoe"
+                          value={username}
+                          onChange={e => setUsername(e.target.value)}
                           className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a]"
                         />
                       </div>
@@ -207,7 +259,8 @@ export default function EditProfilePage() {
                       </Label>
                       <Input
                         id="title"
-                        defaultValue="Multimedia Storyteller"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
                         className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a]"
                       />
                     </div>
@@ -219,7 +272,8 @@ export default function EditProfilePage() {
                       <Textarea
                         id="bio"
                         rows={4}
-                        defaultValue="Passionate storyteller exploring the intersection of narrative and technology. I create immersive multimedia stories that blend text, visuals, audio, and interactive elements. My work focuses on environmental themes and human connections in the digital age."
+                        value={bio}
+                        onChange={e => setBio(e.target.value)}
                         className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a]"
                       />
                       <p className="text-[#8892b0] text-xs">
@@ -235,7 +289,8 @@ export default function EditProfilePage() {
                         <Input
                           id="email"
                           type="email"
-                          defaultValue="jane.doe@example.com"
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
                           className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a]"
                         />
                       </div>
@@ -245,7 +300,8 @@ export default function EditProfilePage() {
                         </Label>
                         <Input
                           id="location"
-                          defaultValue="San Francisco, CA"
+                          value={location}
+                          onChange={e => setLocation(e.target.value)}
                           className="bg-[#1d3557] border-[#2d4a7a] text-white focus-visible:ring-[#f3d34a]"
                         />
                       </div>
@@ -471,9 +527,17 @@ export default function EditProfilePage() {
             <Button variant="outline" className="border-[#2d4a7a] text-[#8892b0] hover:text-white" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]" onClick={handleSaveChanges}>
-              <Save className="h-4 w-4 mr-2" />
-              Save Changes
+            <Button
+              className="bg-[#f3d34a] hover:bg-[#f3d34a]/90 text-[#0a192f]"
+              onClick={handleSaveChanges}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
             </Button>
           </div>
         </Tabs>
