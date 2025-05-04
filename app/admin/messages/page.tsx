@@ -10,6 +10,7 @@ import { Search, Trash2, MoreHorizontal, Filter, RefreshCw, MessageSquare } from
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConfirmationDialog } from "../components/confirmation-dialog"
+import { AdminSidebar } from "@/app/admin/components/admin-sidebar"
 
 interface Message {
   id: string
@@ -108,7 +109,7 @@ export default function MessageManagement() {
     setMessageError(null)
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/messages", {
+      const response = await fetch("/dashboard", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -134,7 +135,7 @@ export default function MessageManagement() {
     setConversationError(null)
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/conversations", {
+      const response = await fetch("api/admin/dashboard", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -512,157 +513,162 @@ export default function MessageManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Message Management</h1>
-          <p className="text-[#8892b0]">Manage and moderate user messages</p>
+    <div className="flex min-h-screen">
+      <AdminSidebar />
+      <main className="flex-1 ml-56 p-8">
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Message Management</h1>
+              <p className="text-[#8892b0]">Manage and moderate user messages</p>
+            </div>
+          </div>
+
+          <Tabs defaultValue="messages" className="w-full" onValueChange={setActiveTab}>
+            <TabsList className="bg-[#112240] w-full justify-start mb-6">
+              <TabsTrigger value="messages" className="data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]">
+                Messages
+              </TabsTrigger>
+              <TabsTrigger
+                value="conversations"
+                className="data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]"
+              >
+                Conversations
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="messages">
+              <Card className="bg-[#112240] border-[#1d3557] text-white">
+                <CardHeader className="pb-2">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <div>
+                      <CardTitle>Messages</CardTitle>
+                      <CardDescription className="text-[#8892b0]">Manage all messages on the platform</CardDescription>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
+                        <Input
+                          placeholder="Search messages..."
+                          className="pl-10 bg-[#1d3557] border-[#1d3557] text-white w-full sm:w-64"
+                          value={messageSearchQuery}
+                          onChange={(e) => setMessageSearchQuery(e.target.value)}
+                        />
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="border-[#1d3557] text-white hover:bg-[#1d3557]">
+                            <Filter className="h-4 w-4 mr-2" />
+                            {messageStatusFilter === "all"
+                              ? "All Messages"
+                              : messageStatusFilter === "active"
+                                ? "Active"
+                                : "Reported"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-[#112240] border-[#1d3557] text-white">
+                          <DropdownMenuItem
+                            className="hover:bg-[#1d3557] cursor-pointer"
+                            onClick={() => setMessageStatusFilter("all")}
+                          >
+                            All Messages
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="hover:bg-[#1d3557] cursor-pointer"
+                            onClick={() => setMessageStatusFilter("active")}
+                          >
+                            Active
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="hover:bg-[#1d3557] cursor-pointer"
+                            onClick={() => setMessageStatusFilter("reported")}
+                          >
+                            Reported
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <Button
+                        variant="outline"
+                        className="border-[#1d3557] text-white hover:bg-[#1d3557]"
+                        onClick={fetchMessages}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Refresh
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>{renderMessagesContent()}</CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="conversations">
+              <Card className="bg-[#112240] border-[#1d3557] text-white">
+                <CardHeader className="pb-2">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <div>
+                      <CardTitle>Conversations</CardTitle>
+                      <CardDescription className="text-[#8892b0]">Manage all conversations on the platform</CardDescription>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
+                        <Input
+                          placeholder="Search conversations..."
+                          className="pl-10 bg-[#1d3557] border-[#1d3557] text-white w-full sm:w-64"
+                          value={conversationSearchQuery}
+                          onChange={(e) => setConversationSearchQuery(e.target.value)}
+                        />
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="border-[#1d3557] text-white hover:bg-[#1d3557]">
+                            <Filter className="h-4 w-4 mr-2" />
+                            {conversationStatusFilter === "all"
+                              ? "All Conversations"
+                              : conversationStatusFilter === "active"
+                                ? "Active"
+                                : "Reported"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-[#112240] border-[#1d3557] text-white">
+                          <DropdownMenuItem
+                            className="hover:bg-[#1d3557] cursor-pointer"
+                            onClick={() => setConversationStatusFilter("all")}
+                          >
+                            All Conversations
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="hover:bg-[#1d3557] cursor-pointer"
+                            onClick={() => setConversationStatusFilter("active")}
+                          >
+                            Active
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="hover:bg-[#1d3557] cursor-pointer"
+                            onClick={() => setConversationStatusFilter("reported")}
+                          >
+                            Reported
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <Button
+                        variant="outline"
+                        className="border-[#1d3557] text-white hover:bg-[#1d3557]"
+                        onClick={fetchConversations}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Refresh
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>{renderConversationsContent()}</CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
-
-      <Tabs defaultValue="messages" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="bg-[#112240] w-full justify-start mb-6">
-          <TabsTrigger value="messages" className="data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]">
-            Messages
-          </TabsTrigger>
-          <TabsTrigger
-            value="conversations"
-            className="data-[state=active]:bg-[#0a192f] data-[state=active]:text-[#f3d34a]"
-          >
-            Conversations
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="messages">
-          <Card className="bg-[#112240] border-[#1d3557] text-white">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                  <CardTitle>Messages</CardTitle>
-                  <CardDescription className="text-[#8892b0]">Manage all messages on the platform</CardDescription>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
-                    <Input
-                      placeholder="Search messages..."
-                      className="pl-10 bg-[#1d3557] border-[#1d3557] text-white w-full sm:w-64"
-                      value={messageSearchQuery}
-                      onChange={(e) => setMessageSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="border-[#1d3557] text-white hover:bg-[#1d3557]">
-                        <Filter className="h-4 w-4 mr-2" />
-                        {messageStatusFilter === "all"
-                          ? "All Messages"
-                          : messageStatusFilter === "active"
-                            ? "Active"
-                            : "Reported"}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#112240] border-[#1d3557] text-white">
-                      <DropdownMenuItem
-                        className="hover:bg-[#1d3557] cursor-pointer"
-                        onClick={() => setMessageStatusFilter("all")}
-                      >
-                        All Messages
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="hover:bg-[#1d3557] cursor-pointer"
-                        onClick={() => setMessageStatusFilter("active")}
-                      >
-                        Active
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="hover:bg-[#1d3557] cursor-pointer"
-                        onClick={() => setMessageStatusFilter("reported")}
-                      >
-                        Reported
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    variant="outline"
-                    className="border-[#1d3557] text-white hover:bg-[#1d3557]"
-                    onClick={fetchMessages}
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>{renderMessagesContent()}</CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="conversations">
-          <Card className="bg-[#112240] border-[#1d3557] text-white">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                  <CardTitle>Conversations</CardTitle>
-                  <CardDescription className="text-[#8892b0]">Manage all conversations on the platform</CardDescription>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8892b0]" />
-                    <Input
-                      placeholder="Search conversations..."
-                      className="pl-10 bg-[#1d3557] border-[#1d3557] text-white w-full sm:w-64"
-                      value={conversationSearchQuery}
-                      onChange={(e) => setConversationSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="border-[#1d3557] text-white hover:bg-[#1d3557]">
-                        <Filter className="h-4 w-4 mr-2" />
-                        {conversationStatusFilter === "all"
-                          ? "All Conversations"
-                          : conversationStatusFilter === "active"
-                            ? "Active"
-                            : "Reported"}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#112240] border-[#1d3557] text-white">
-                      <DropdownMenuItem
-                        className="hover:bg-[#1d3557] cursor-pointer"
-                        onClick={() => setConversationStatusFilter("all")}
-                      >
-                        All Conversations
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="hover:bg-[#1d3557] cursor-pointer"
-                        onClick={() => setConversationStatusFilter("active")}
-                      >
-                        Active
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="hover:bg-[#1d3557] cursor-pointer"
-                        onClick={() => setConversationStatusFilter("reported")}
-                      >
-                        Reported
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    variant="outline"
-                    className="border-[#1d3557] text-white hover:bg-[#1d3557]"
-                    onClick={fetchConversations}
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>{renderConversationsContent()}</CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      </main>
     </div>
   )
 }

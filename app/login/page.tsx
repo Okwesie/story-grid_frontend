@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
-  const { login, isAuthenticated, user } = useAuth() // Updated: Included user
+  const { login, isAuthenticated, user } = useAuth()
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -21,13 +25,12 @@ const Login = () => {
     }
   }, [isAuthenticated, user, router])
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-
     try {
       await login(email, password)
-      // No need to redirect here, useEffect will handle it
+      // Redirect handled by useEffect
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -38,46 +41,70 @@ const Login = () => {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <h2 className="block text-gray-700 text-sm font-bold mb-2">Login</h2>
-        {error && <p className="text-red-500 text-xs italic">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+    <div className="min-h-screen bg-[#0a192f] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20 shadow-xl">
+        <h1 className="text-2xl font-bold text-center mb-6 text-[#f4ce14]">Sign in to your account</h1>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded text-white text-sm">{error}</div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">
               Email
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            </Label>
+            <Input
               id="email"
               type="email"
-              placeholder="Email"
+              required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
+              className="bg-white/10 border-white/20 text-white"
+              autoComplete="email"
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-white">
               Password
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+            </Label>
+            <Input
               id="password"
               type="password"
-              placeholder="Password"
+              required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
+              className="bg-white/10 border-white/20 text-white"
+              autoComplete="current-password"
             />
           </div>
-          <div className="flex items-center justify-between">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="submit"
-            >
-              Sign In
-            </button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full bg-[#f4ce14] hover:bg-[#e3bd13] text-[#0a192f] font-semibold"
+          >
+            Sign In
+          </Button>
         </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-white/20"></span>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-[#0a192f] px-2 text-white">or continue with</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center text-sm">
+          <p className="text-white">
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="font-semibold text-[#f4ce14] hover:underline">
+              Sign Up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

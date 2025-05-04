@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { updateProfile } from "@/lib/api" // import your helper
+//import { updateProfile } from "@/lib/api" // import your helper
 
 interface Skill {
   id: string;

@@ -61,7 +61,7 @@ export const adminApi = {
   // Dashboard metrics
   getDashboardMetrics: async () => {
     try {
-      return await fetchApi("/admin/dashboard-metrics")
+      return await fetchApi("/admin/dashboard")
     } catch (error) {
       console.error("Failed to fetch dashboard metrics:", error)
       throw new Error("Failed to fetch dashboard metrics")
