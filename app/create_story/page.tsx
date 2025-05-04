@@ -709,14 +709,7 @@ export default function CreateStoryPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="border-[#1d3557] text-[#8892b0] hover:text-white"
-              onClick={() => setShowPreview(!showPreview)}
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              {showPreview ? "Hide Preview" : "Preview"}
-            </Button>
+            
             <Button
               variant="outline"
               className="border-[#1d3557] text-[#8892b0] hover:text-white"
