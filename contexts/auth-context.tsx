@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/lib/api"
-import { safeLocalStorage } from "@/lib/utils"
+import { safeLocalStorage, setCookie, getCookie, deleteCookie } from "@/lib/utils"
 
 // Define the AuthContext type
 type AuthContextType = {
@@ -47,21 +47,52 @@ type AuthProviderProps = {
   children: ReactNode
 }
 
+// Token functions with cookie fallback
+const getToken = (): string | null => {
+  // Try localStorage first
+  const token = safeLocalStorage.getItem("token");
+  if (token) return token;
+  
+  // Fallback to cookie
+  return getCookie("auth_token");
+};
+
+const saveToken = (token: string): void => {
+  safeLocalStorage.setItem("token", token);
+  // Also save in cookie for redundancy
+  setCookie("auth_token", token, 7); // 7 days expiry
+};
+
+const clearToken = (): void => {
+  safeLocalStorage.removeItem("token");
+  deleteCookie("auth_token");
+};
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  // Check if user is authenticated on mount
+  // Enhanced auth check with retry mechanism
   useEffect(() => {
+    // Skip on server-side
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+    
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryInterval = 1000; // 1 second
+
     const checkAuth = async () => {
       setIsLoading(true)
       setError(null)
 
       try {
-        // Check if token exists in localStorage
-        const token = safeLocalStorage.getItem("token")
+        // Check if token exists
+        const token = getToken();
 
         if (!token) {
           setUser(null)
@@ -69,24 +100,71 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return
         }
 
-        const userData = await api.auth.getCurrentUser()
-        if (userData.data?.user) {
-          setUser(userData.data.user)
-        } else if (userData.user) {
-          setUser(userData.user)
+        // Attempt to get current user with token
+        try {
+          const userData = await api.auth.getCurrentUser()
+          
+          // Handle different response structures
+          let extractedUser = null;
+          
+          if (userData.data?.user) {
+            extractedUser = userData.data.user;
+          } else if (userData.user) {
+            extractedUser = userData.user;
+          } else if (userData.data) {
+            // Sometimes the user might be directly in data
+            extractedUser = userData.data;
+          }
+          
+          if (extractedUser && extractedUser.id) {
+            setUser(extractedUser)
+            // Reset retry counter on success
+            retryCount = 0;
+          } else {
+            // If response doesn't have expected user data, retry
+            throw new Error("Invalid user data format")
+          }
+        } catch (err) {
+          console.error("Auth check error:", err)
+          
+          // Only retry if we haven't exceeded max retries
+          if (retryCount < maxRetries) {
+            retryCount++;
+            console.log(`Retrying auth check (${retryCount}/${maxRetries})...`);
+            setTimeout(checkAuth, retryInterval);
+            return;
+          }
+          
+          // If all retries failed, clear token
+          clearToken();
+          setUser(null)
+          // Don't set error message to avoid UI flicker
         }
       } catch (err) {
+        console.error("Auth check outer error:", err)
+        // Clear token from localStorage on critical errors
+        clearToken();
         setUser(null)
-        setError("Authentication error. Please try again.")
-        console.error("Auth check error:", err)
-        // Clear token from localStorage
-        safeLocalStorage.removeItem("token")
+        // Don't set error message to avoid UI flicker
       } finally {
         setIsLoading(false)
       }
     }
 
+    // Run authentication check
     checkAuth()
+    
+    // Set up periodic token validation (every 15 minutes)
+    const tokenValidationInterval = setInterval(() => {
+      const token = getToken();
+      if (token) {
+        checkAuth()
+      }
+    }, 15 * 60 * 1000)
+    
+    return () => {
+      clearInterval(tokenValidationInterval)
+    }
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -95,6 +173,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await api.auth.login({ email, password })
       console.log("Login response:", response)
+
+      if (response.data?.token) {
+        // Save token to both localStorage and cookie
+        saveToken(response.data.token);
+      }
 
       if (response.data?.user) {
         setUser(response.data.user)
@@ -116,16 +199,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true)
     try {
       await api.auth.logout()
-      setUser(null)
-      router.push("/login")
     } catch (error) {
       console.error("Logout error:", error)
-      // Even if the API call fails, clear the local state
-      setUser(null)
-      // Clear token and user data
-      safeLocalStorage.removeItem("token")
     } finally {
+      // Always clear state and tokens even if API call fails
+      setUser(null)
+      clearToken();
       setIsLoading(false)
+      router.push("/login")
     }
   }
 
@@ -149,10 +230,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const userData = await api.auth.getCurrentUser()
+      
+      // Handle different response structures
       if (userData.data?.user) {
         setUser(userData.data.user)
       } else if (userData.user) {
         setUser(userData.user)
+      } else if (userData.data && userData.data.id) {
+        // Sometimes the user might be directly in data
+        setUser(userData.data)
       }
     } catch (err) {
       setError("Failed to refresh profile. Please try again.")
