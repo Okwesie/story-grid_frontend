@@ -1,6 +1,9 @@
 // Base URL for your API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"
 
+// Import utility functions
+import { setCookie, getCookie, deleteCookie } from "@/lib/utils"
+
 // Types for better type safety
 export interface User {
   id: string
@@ -111,15 +114,96 @@ export interface ApiError extends Error {
   }
 }
 
-// Generic fetch function with error handling
+// Token management functions with cookie fallback
+function getAuthToken(): string | null {
+  // Skip on server
+  if (typeof window === "undefined") return null;
+  
+  // Try localStorage first
+  const token = localStorage.getItem("token");
+  if (token) return token;
+  
+  // Fallback to cookie
+  return getCookie("auth_token");
+}
+
+function setAuthToken(token: string): void {
+  if (typeof window === "undefined") return;
+  
+  // Store in both localStorage and cookie for redundancy
+  localStorage.setItem("token", token);
+  setCookie("auth_token", token, 7); // 7 days
+}
+
+function removeAuthToken(): void {
+  if (typeof window === "undefined") return;
+  
+  localStorage.removeItem("token");
+  deleteCookie("auth_token");
+}
+
+// Check if we're on server side
+const isServer = () => typeof window === "undefined"
+
+// Cache to prevent multiple concurrent token refreshes
+let isRefreshing = false
+let failedQueue: Array<{
+  resolve: (token: string) => void
+  reject: (error: Error) => void
+}> = []
+
+// Process the failed queue
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((promise) => {
+    if (error) {
+      promise.reject(error)
+    } else if (token) {
+      promise.resolve(token)
+    }
+  })
+  
+  failedQueue = []
+}
+
+// Generic fetch function with error handling and token refresh
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
+  // Skip token-related operations on server
+  if (isServer()) {
+    const url = `${API_BASE_URL}${endpoint}`
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(options.headers as Record<string, string>)
+    }
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      })
+
+      if (response.status === 204) {
+        return { success: true }
+      }
+
+      const data = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = data.msg || "Something went wrong"
+        throw new Error(errorMessage)
+      }
+
+      return data
+    } catch (error) {
+      console.error("API request failed on server:", error)
+      throw error
+    }
+  }
+
+  // Client-side code from here on
   const url = `${API_BASE_URL}${endpoint}`
 
   // Get token from localStorage if available
-  let token = null
-  if (typeof window !== "undefined") {
-    token = localStorage.getItem("token")
-  }
+  let token = getAuthToken()
 
   const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -131,8 +215,6 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     headers["Content-Type"] = "application/json"
   }
 
-  console.log("fetchApi headers:", headers)
-
   try {
     const response = await fetch(url, {
       ...options,
@@ -141,6 +223,64 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
     if (response.status === 204) {
       return { success: true }
+    }
+
+    // Special handling for 401 Unauthorized - potential token expiration
+    if (response.status === 401 && token && !endpoint.includes("/auth/refresh")) {
+      if (isRefreshing) {
+        // If already refreshing, wait for new token
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((newToken) => {
+            headers.Authorization = `Bearer ${newToken}`
+            return fetch(url, {
+              ...options,
+              headers,
+            }).then(async (retryResponse) => {
+              if (retryResponse.status === 204) {
+                return { success: true }
+              }
+              return await retryResponse.json()
+            })
+          })
+          .catch((err) => {
+            console.error("Token refresh failed:", err)
+            removeAuthToken()
+            // Avoid page refresh within an API call to prevent hydration issues
+            return { success: false, error: "Authentication failed" }
+          })
+      }
+
+      // Start token refresh process
+      isRefreshing = true
+
+      try {
+        // Here you would normally call a token refresh endpoint
+        // For now, we'll just simulate a failed refresh and clear token
+        removeAuthToken()
+        
+        // Reset the refreshing flag
+        isRefreshing = false
+        
+        // Process any queued requests with an error
+        processQueue(new Error("Token expired and refresh failed"))
+        
+        // Return a standardized error response
+        return { 
+          success: false, 
+          data: null, 
+          message: "Authentication session expired" 
+        }
+      } catch (refreshError) {
+        isRefreshing = false
+        processQueue(refreshError as Error)
+        return { 
+          success: false, 
+          data: null, 
+          message: "Authentication error" 
+        }
+      }
     }
 
     const data = await response.json()
@@ -172,7 +312,7 @@ export const authApi = {
       body: JSON.stringify({ data: credentials }),
     })
     if (response.data?.token) {
-      localStorage.setItem("token", response.data.token)
+      setAuthToken(response.data.token)
     }
     return response
   },
@@ -182,7 +322,7 @@ export const authApi = {
   },
 
   logout: async () => {
-    localStorage.removeItem("token")
+    removeAuthToken()
     return fetchApi("/auth/logout", { method: "POST" })
   },
 }
@@ -210,7 +350,7 @@ export const userApi = {
   // New functions
   fetchUserProfile: async () => {
     try {
-      const token = localStorage.getItem("token")
+      const token = getAuthToken()
 
       if (!token) {
         throw new Error("No authentication token found")
@@ -251,7 +391,7 @@ export const userApi = {
 
   updateUserProfile: async (updateData: any) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = getAuthToken()
 
       if (!token) {
         throw new Error("No authentication token found")
@@ -293,7 +433,7 @@ export const userApi = {
 
   changeUserPassword: async (currentPassword: string, newPassword: string) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = getAuthToken()
 
       if (!token) {
         throw new Error("No authentication token found")
@@ -340,7 +480,7 @@ export const userApi = {
 
   logoutUser: async () => {
     try {
-      const token = localStorage.getItem("token")
+      const token = getAuthToken()
 
       if (token) {
         const response = await fetch("/auth/logout", {
@@ -352,7 +492,7 @@ export const userApi = {
         })
 
         // Clear token regardless of response
-        localStorage.removeItem("token")
+        removeAuthToken()
 
         const result = await response.json()
 
@@ -370,7 +510,7 @@ export const userApi = {
     } catch (error) {
       console.error("API Error:", error)
       // Still clear token even if API call fails
-      localStorage.removeItem("token")
+      removeAuthToken()
 
       return {
         success: true, // Consider logout successful even if API fails
